@@ -1,0 +1,3 @@
+datepicker
+URL https://github.com/mrf345/flask_datepicker
+BOOTSTRAP HELP https://pythonhosted.org/Flask-Bootstrap/basic-usage.html

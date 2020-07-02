@@ -1,0 +1,45 @@
+{% extends 'bootstrap/base.html' %}
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    {% block title %}Title{% endblock %}
+
+    {% block styles %}
+      <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.1.0/cookieconsent.min.css" />
+      {% block scripts %}
+        <!-- GDPR COOKIE CONSCENT -->
+        <script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.1.0/cookieconsent.min.js"></script>
+        <script>
+                window.addEventListener("load", function(){
+                window.cookieconsent.initialise({
+                  "palette": {
+                    "popup": {
+                      "background": "#343a40"
+                    },
+                    "button": {
+                      "background": "#17a2b8",
+                      "text": "#ffffff"
+                    }
+                  }
+                })});
+        </script>
+        {{ super() }}
+        {{ datepicker.loader(theme="ui-lightness") }} {# to load jQuery-ui #}
+        {{ datepicker.picker(id=".dp",dateFormat='dd-mm-yy') }}
+        <!-- GDPR COOKIE CONSCENT -->
+      {% endblock %}
+    {{super()}}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;1,300&display=swap" rel="stylesheet">
+    {% endblock %}
+    {% block metas %}
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
+    {% endblock %}
+    <!--<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous"> -->
+  </head>
+
+  {% block body %}
+      {% block content %}
+      {% endblock %}
+  {% endblock %}
