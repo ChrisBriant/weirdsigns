@@ -1,0 +1,153 @@
+{% extends "layout.html" %}
+{% block content %}
+    <section>
+      <div class="row">
+        <div class="col-12 page-head"><h1>Add Sign</h1></div>
+      </div>
+        <div class="row">
+          <div class="col-sm-2"></div>
+          <div class="col-sm-8 login addsign">
+            <form method="POST" enctype="multipart/form-data">
+              {{ form.hidden_tag() }} <!-- csrf token -->
+              <fieldset class="form-group">
+                <legend class="border-bottom mb-4">Upload</legend>
+                <div id="map" class="map"></div>
+                {% if form.lat.errors or form.long.errors %}
+                  <p>You must select an area on the map</p>
+                {% endif %}
+                <script type="text/javascript">
+                  var map = new ol.Map({
+                    target: 'map',
+                    layers: [
+                      new ol.layer.Tile({
+                        source: new ol.source.OSM()
+                      })
+                    ],
+                    view: new ol.View({
+                      //center: ol.proj.fromLonLat([37.41, 8.82]),
+                      center: ol.proj.fromLonLat([-1.50,52.41]),
+                      zoom: 12
+                    })
+                  });
+
+                  var markerLayer;
+
+                  map.on('singleclick', function (evt) {
+                      console.log(evt.coordinate);
+                      console.log(map.getLayers());
+                      if(markerLayer) {
+                        map.removeLayer(markerLayer);
+                      }
+                      //Make the pin icon
+                      var iconStyle = new ol.style.Style({
+                        image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
+                          anchor: [0.5, 46],
+                          anchorXUnits: 'fraction',
+                          anchorYUnits: 'pixels',
+                          opacity: 0.75,
+                          src: '../static/img/mappin.png'
+                        }))
+                      });
+
+                      // convert coordinate to EPSG-4326
+                      lonLat = ol.proj.transform(evt.coordinate, 'EPSG:3857', 'EPSG:4326');
+                      markerLayer = new ol.layer.Vector({
+                        source: new ol.source.Vector({
+                            features: [
+                                new ol.Feature({
+                                    geometry: new ol.geom.Point(ol.proj.fromLonLat([lonLat[0], lonLat[1]]))
+                                })
+                            ]
+                        }),
+                        style: iconStyle
+                      });
+
+                      //Add coords to form
+                      $('#long').val(lonLat[0]);
+                      $('#lat').val(lonLat[1]);
+
+
+                      map.addLayer(markerLayer)
+                  });
+
+                </script>
+                <div class="form-group">
+                  {{ form.wherefound.label(class="form-control-label col-2") }}
+                  {% if form.wherefound.errors %}
+                    {{ form.wherefound(class="form-control-md col-8") }}
+                    <div class="invalid-feedback">
+                      {% for error in form.wherefound.errors %}
+                        <p>{{ form.wherefound.errors }}</p>
+                        <span>{{ error }}</span>
+                      {% endfor %}
+                    </div>
+                  {% else %}
+                    {{ form.wherefound(class="form-control-md col-8") }}
+                  {% endif %}
+                </div>
+                <div class="form-group">
+                  {{ form.title.label(class="form-control-label col-2") }}
+                  {% if form.title.errors %}
+                    {{ form.title(class="form-control-md col-8") }}
+                    <div class="invalid-feedback">
+                      {% for error in form.title.errors %}
+                        <p>{{ form.title.errors }}</p>
+                        <span>{{ error }}</span>
+                      {% endfor %}
+                    </div>
+                  {% else %}
+                    {{ form.title(class="form-control-md col-8") }}
+                  {% endif %}
+                </div>
+                <div class="form-group">
+                  {{ form.photo.label(class="form-control-label col-2") }}
+                  {% if form.photo.errors %}
+                    {{ form.photo(class="form-control-md col-8") }}
+                    <div class="invalid-feedback">
+                      {% for error in form.photo.errors %}
+                        <p>{{ form.photo.errors }}</p>
+                        <span>{{ error }}</span>
+                      {% endfor %}
+                    </div>
+                  {% else %}
+                    {{ form.photo(class="form-control-md col-8") }}
+                  {% endif %}
+                </div>
+                <div class="form-group">
+                  {{ form.long.label(class="form-control-label col-2") }}
+                  {% if form.long.errors %}
+                    {{ form.long(class="form-control-md col-8") }}
+                    <div class="invalid-feedback">
+                      {% for error in form.long.errors %}
+                        <p>{{ form.long.errors }}</p>
+                        <span>{{ error }}</span>
+                      {% endfor %}
+                    </div>
+                  {% else %}
+                    {{ form.long(class="form-control-md col-8") }}
+                  {% endif %}
+                </div>
+                <div class="form-group">
+                  {{ form.lat.label(class="form-control-label col-2") }}
+                  {% if form.lat.errors %}
+                    {{ form.lat(class="form-control-md col-8") }}
+                    <div class="invalid-feedback">
+                      {% for error in form.lat.errors %}
+                        <p>{{ form.lat.errors }}</p>
+                        <span>{{ error }}</span>
+                      {% endfor %}
+                    </div>
+                  {% else %}
+                    {{ form.lat(class="form-control-md col-8") }}
+                  {% endif %}
+                </div>
+                <div class="form-group">
+                  {{ form.submit(class="btn btn-primary") }}
+                </div>
+              </fieldset>
+            </form>
+        </div>
+        <div class="col-sm-2"></div>
+      </div>
+    </section>
+{% endblock content %}

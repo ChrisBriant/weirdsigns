@@ -6,6 +6,7 @@
 
     {% block styles %}
       <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.1.0/cookieconsent.min.css" />
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.3.1/css/ol.css" type="text/css">
       {% block scripts %}
         <!-- GDPR COOKIE CONSCENT -->
         <script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.1.0/cookieconsent.min.js"></script>
@@ -23,6 +24,7 @@
                   }
                 })});
         </script>
+        <script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.3.1/build/ol.js"></script>
         {{ super() }}
         {{ datepicker.loader(theme="ui-lightness") }} {# to load jQuery-ui #}
         {{ datepicker.picker(id=".dp",dateFormat='dd-mm-yy') }}
@@ -40,6 +42,43 @@
   </head>
 
   {% block body %}
+      <nav class="navbar">
+        <a class="navbar-brand" href="#">Navbar</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item active">
+            <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Features</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Pricing</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link disabled" href="#">Disabled</a>
+          </li>
+        </ul>
+        </div>
+      </nav>
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">
+              {{ message | safe }}
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+      <div id="alert" class="alert alert-success" style="display:none;"></div>
       {% block content %}
       {% endblock %}
+      {% if not home %}
+      <footer>
+        <h1>FOOTER</h1>
+      </footer>
+      {% endif %}
   {% endblock %}

@@ -1,0 +1,55 @@
+{% extends "layout.html" %}
+{% block content %}
+    <section>
+      <div class="row">
+        <div class="col-sm-3"></div>
+        <div class="col-sm-6 register">
+          <div class="dialog">
+          <form method="POST" action="">
+            {{ form.hidden_tag() }} <!-- csrf token -->
+            <fieldset class="form-group">
+              <legend class="mb-4">Join Today</legend>
+                <div class="row">
+                  <div class="col-sm-6">{{ form.username.label(class="form-control-label") }}</div>
+                  <div class="col-sm-6">{{ form.username(class="form-control-sm") }}</div>
+                </div><br/>
+                <div class="row">
+                  <div class="col-sm-6">{{ form.email.label(class="form-control-label") }}</div>
+                  <div class="col-sm-6">{{ form.email(class="form-control-sm") }}</div>
+                </div><br/>
+                <div class="row">
+                  <div class="col-sm-6">{{ form.password.label(class="form-control-label") }}</div>
+                  <div class="col-sm-6">{{ form.password(class="form-control-sm") }}</div>
+                </div><br/>
+                <div class="row">
+                  <div class="col-sm-6">{{ form.confirm_password.label(class="form-control-label") }}</div>
+                  <div class="col-sm-6">{{ form.confirm_password(class="form-control-sm") }}</div>
+                </div><br/>
+                <div class="tandc">
+                  <p><strong>Terms and Conditions</strong></p>
+                  <p>By registering for this site, I agree for the website to store my email address. This is used only for the purpose of user verifitcation
+                    and will not be displayed anywhere within the app.</p>
+                  <p>I understand that the author of this website is not responsible for any of the content posted by other users.</p>
+                  <p>The author reserves the right to remove my account at any point and without warning.</p>
+                  <p>I can erase my user account and associated data at any time by clicking delete account from the home page.</p>
+                </div>
+                <div class="row">
+                  <div class="col-sm-6">{{ form.iagree.label(class="form-control-label") }}</div>
+                  <div class="col-sm-3">{{ form.iagree(class="form-control-sm") }}</div>
+                </div><br/>
+            </fieldset>
+            <div class="form-group">
+              {{ form.submit(class="btn btn-primary") }}
+            </div>
+          </form>
+          <div class="border-top pt-3">
+            <small class="text-muted">
+              Already Have An Account? <a class="ml-2" href="{{ url_for('login') }}">Sign in</a>
+            </small>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-3"></div>
+      </div>
+    </section>
+{% endblock content %}

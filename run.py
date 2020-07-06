@@ -1,4 +1,4 @@
-from flask_template import app
+from weirdsigns import app
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+{% block content %}
+    <header>
+      <div class="row">
+        <div class="col-8 hero-text">
+          <h1 class="herotitle">Weird Signs</h1>
+          <p>Take a look at some of the funniest signs and notices people put up.</p>
+          <p>Login to upload funny signs that you have seen</p>
+          <a href="/latest">View the Latest Here</a>
+        </div>
+        <div class="col-4 hero-login-col">
+          <div class="hero-login">
+            {% include 'login.html' %}
+          </div>
+        </div>
+      </div>
+    </header>
+{% endblock content %}
