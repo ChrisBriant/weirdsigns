@@ -6,6 +6,24 @@ from weirdsigns.models import User
 from bson import ObjectId, Decimal128
 from flask_login import login_user, current_user, logout_user, login_required
 import os, secrets, datetime, uuid
+from bson.json_util import dumps
+
+#Process the sign data
+def process_signs(signs):
+    for s in signs:
+        s['created'] = s['created'].strftime("%d/%m/%Y, %H:%M:%S")
+        if s.get('location'):
+            #convert to long and lat
+            s['long'] = s['location']['coordinates'][0]
+            s['lat'] = s['location']['coordinates'][1]
+            print(s['location']);
+        if s.get("ratings") and current_user.is_authenticated:
+            if ObjectId(current_user.id) in [rating['user_id'] for rating in s['ratings']]:
+                s["already_rated"] = True
+        else:
+            s["already_rated"] = False
+    return signs
+
 
 #For sending the media location
 @app.route('/pictures/<filename>')
@@ -23,31 +41,123 @@ def most_recent_file():
 @app.route("/", methods=['GET', 'POST'])
 @app.route("/home", methods=['GET', 'POST'])
 def home():
+    message= ''
     form = LoginForm()
     if form.validate_on_submit():
         user_dict = db.users.find_one({"email":form.email.data })
-        if user_dict and bcrypt.check_password_hash(user_dict["password"],form.password.data):
+        if user_dict["enabled"] and bcrypt.check_password_hash(user_dict["password"],form.password.data):
             user = User(id=str(user_dict["_id"]), username=user_dict["username"])
             login_user(user, remember=form.remember.data)
-            return redirect(url_for("home"))
+            return redirect(url_for("latest"))
         else:
             flash(f"Login unsuccessful!","danger")
+            message = "Login unsuccessful!"
     else:
-        errors = [form.errors[k] for k in form.errors.keys()]
-        flash(errors,"danger")
+        #errors = [form.errors[k] for k in form.errors.keys()]
+        #flash(errors,"danger")
+        print(form.errors)
+        #message=errors
     #signs = db.signs.find().sort([( '$natural', 1 )] ).limit(10)
     #signs = None
-    return render_template("home.html",form=form,home=True)
+    return render_template("home.html",form=form,home=True,message=message)
 
 
 @app.route("/latest", methods=['GET', 'POST'])
 def latest():
-    signs = db.signs.find().sort([( '$natural', -1 )] ).limit(10)
-    signs=list(signs)
-    print(signs)
-    for s in signs:
-        s['created'] = s['created'].strftime("%d/%m/%Y, %H:%M:%S")
+    #signs = db.signs.find().sort([( '$natural', -1 )] ).limit(10)
+    signs = db.signs.aggregate([
+        { '$addFields' : {
+                'title' : '$title',
+                'creator': '$creator',
+                'created': '$created',
+                'wherefound' : '$wherefound',
+                'ratings' : '$ratings',
+                'long' : '$long',
+                'lat' : '$lat',
+                'location': '$location',
+                'file' : '$file',
+                'AverageRating' : { '$avg': "$ratings.rating" },
+                'NumberOfRatings': { '$size': { "$ifNull": [ "$ratings", [] ] } }
+            }
+        },
+        { '$sort' : {
+                'created' : -1,
+            },
+        },
+        { '$limit' : 10 }
+    ])
+    #signs=list(signs)
+    signs = process_signs(list(signs))
     return render_template("latest.html",home=True, signs=signs)
+
+@app.route("/popular", methods=['GET', 'POST'])
+def popular():
+    """
+    signs = db.signs.aggregate([
+       { '$match': { status: "A" } },
+       { $group: { _id: "$cust_id", total: { $sum: "$amount" } } }
+    ])
+    """
+
+    """
+    signs = db.signs.aggregate(([
+    { '$unwind': '$ratings' },
+    {
+        '$group': {
+          '_id': '_id',
+          'TotalRating': { '$sum': "ratings.rating" }
+        }
+      }
+    ]))
+    """
+
+    """
+    signs = db.signs.aggregate([
+        {
+            '$project' : {
+                'title' : '$title',
+                'creator': '$creator',
+                'created': '$created',
+                'wherefound' : '$wherefound',
+                'ratings' : '$ratings',
+                'long' : '$long',
+                'lat' : '$lat',
+                'file' : '$file',
+                'AverageRating' : { '$avg': "$ratings.rating" }
+            }
+        }
+    ])
+    """
+
+    signs = db.signs.aggregate([
+        { '$addFields' : {
+                'title' : '$title',
+                'creator': '$creator',
+                'created': '$created',
+                'wherefound' : '$wherefound',
+                'ratings' : '$ratings',
+                'long' : '$long',
+                'lat' : '$lat',
+                'location': '$location',
+                'file' : '$file',
+                'AverageRating' : { '$avg': "$ratings.rating" },
+                'NumberOfRatings': { '$size': { "$ifNull": [ "$ratings", [] ] } }
+            }
+        },
+        { '$sort' : {
+                'AverageRating' : -1,
+                'NumberOfRatings': -1
+            },
+        },
+        { '$limit' : 10 }
+    ])
+    signs=process_signs(list(signs))
+    return render_template("latest.html",home=True, signs=signs)
+
+
+@app.route("/bylocation", methods=['GET', 'POST'])
+def bylocation():
+    return render_template("bylocation.html", signs=None)
 
 
 @app.route("/ratesign", methods=['POST'])
@@ -56,12 +166,33 @@ def rate_sign():
     if current_user.is_authenticated:
         data = request.get_json(force=True)
         try:
-            db.signs.update_one({"_id":ObjectId(data["signId"]),'ratings.user_id': {'$ne': ObjectId(current_user.id)}}, {"$addToSet": {"ratings":{"user_id":ObjectId(current_user.id),"rating":data["rating"] } }}, upsert=True)
+            db.signs.update_one({"_id":ObjectId(data["signId"]),'ratings.user_id': {'$ne': ObjectId(current_user.id)}}, {"$addToSet": {"ratings":{"user_id":ObjectId(current_user.id),"rating":int(data["rating"]) } }}, upsert=True)
         except Exception as e:
             print(e)
         print(data)
         print(ObjectId(current_user.id))
     return jsonify(success=True)
+
+@app.route("/getsignswithin", methods=['POST'])
+def signs_within():
+    print('getsignswithin')
+    data = request.get_json(force=True)
+
+    print(data)
+
+    signs = db.signs.find({
+      'location': {
+         '$geoWithin': {
+            '$box': [
+              [ data['extent'][0],data['extent'][1] ],
+              [ data['extent'][2],data['extent'][3] ]
+            ]
+         }
+      }
+    })
+    #print(dumps(list(signs)))
+    #return jsonify(success=True)
+    return dumps(list(signs)), 200, {'ContentType':'application/json'}
 
 
 @app.route('/addsign', methods=['GET', 'POST'])
@@ -85,8 +216,11 @@ def addsign():
                         "file":newfilename,
                         "creator":user_dict,
                         "created":datetime.datetime.now(),
-                        "long":Decimal128(form.long.data),
-                        "lat":Decimal128(form.lat.data)
+                        "location": {
+                            "type":"Point",
+                            "coordinates" : [ Decimal128(form.long.data), Decimal128(form.lat.data)]
+                        }
+
         }
         sign_id= db.signs.insert_one(sign_dict)
         return redirect(url_for('home'))
@@ -97,7 +231,7 @@ def addsign():
 def register():
     if current_user.is_authenticated:
         logout_user()
-        return redirect(url_for("login"))
+        return redirect(url_for("home"))
     form = RegistrationForm()
     if form.validate_on_submit():
         #Check username and password unique in database

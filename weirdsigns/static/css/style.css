@@ -167,7 +167,7 @@ h3 {
 
 header .hero-login {
   background-color: rgba(255, 255, 255,.5);
-  padding: 2%;
+  padding: 20px;
   border-radius: 15px;
 }
 
@@ -255,7 +255,8 @@ input[type=submit] {
   padding: 10px;
 }
 
-.register {
+.register,
+.addsign {
   background-color: rgba(255, 255, 255,.5);
   padding: 10px;
   border-radius: 15px;
@@ -269,6 +270,12 @@ input[type=submit] {
 legend {
   font-size: 100%;
   border-bottom: 1px solid #2e2e2e;
+}
+
+.error-message {
+  background-color: #ff7a70;
+  border: 1px solid #910a00;
+  color: #910a00;
 }
 /*----------------------------------------------*/
 /*LINKS*/
@@ -332,6 +339,12 @@ a:active {
     color: #FFCA00;
 }
 
+.fa-check {
+  color: #00b818;
+}
+
+
+
 /*
 .rating-starfilled:after {
     position: relative;
@@ -372,7 +385,7 @@ a:active {
 
 
 /*----------------------------------------------*/
-/*CARDS*/
+/*CARDS LATEST and POPULAR */
 /*----------------------------------------------*/
 
 .card {
@@ -467,6 +480,18 @@ a:active {
   border: 1px solid #000;
   margin: 0 10%;
 }
+
+/*----------------------------------------------*/
+/*By Location */
+/*----------------------------------------------*/
+
+#mainmap {
+  width: 800px;
+  height: 500px;
+  text-align: center;
+}
+
+
 /*----------------------------------------------*/
 /*BUTTONS*/
 /*----------------------------------------------*/

@@ -40,6 +40,8 @@
           $(".submit-rating").click(function(e){
 
             e.preventDefault();
+            console.log(e);
+
             var signId = $(this).attr('id').toString();
             var rating = $('#rating_'+ signId +' .fa-star').length.toString();
             var dataToSubmit = JSON.stringify({ signId:signId,rating:rating });
@@ -59,10 +61,100 @@
         });
       </script>
       <div class="row">
-
-        <div class="col-12 page-head"><h1>Latest Signs</h1></div>
+        <div class="col-12 page-head"><h1>View By Location</h1></div>
       </div>
 
+      <div class="row">
+        <div class="col-1"></div>
+        <div class="col-10">
+          <p>Select a Location on the Map to View Signs</p>
+          <div id="mainmap" class="map" ></div>
+            <script type="text/javascript">
+              var map = new ol.Map({
+                target: 'mainmap',
+                layers: [
+                  new ol.layer.Tile({
+                    source: new ol.source.OSM()
+                  })
+                ],
+                view: new ol.View({
+                  //center: ol.proj.fromLonLat([37.41, 8.82]),
+                  center: [0, 0],
+                  zoom: 1
+                }),
+                controls: ol.control.defaults({
+                  attributionOptions: {
+                    className: 'my-ol-attribution'
+                  },
+                  zoom:false
+                })
+              });
+
+              //Make the pin icon
+              var iconStyle = new ol.style.Style({
+                image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
+                  anchor: [0.5, 46],
+                  anchorXUnits: 'fraction',
+                  anchorYUnits: 'pixels',
+                  opacity: 0.75,
+                  src: '../static/img/mappin.png'
+                }))
+              });
+
+              function addMarker(lon,lat) {
+                console.log('addmarker',lon,lat);
+                markerLayer = new ol.layer.Vector({
+                  source: new ol.source.Vector({
+                      features: [
+                          new ol.Feature({
+                            geometry: new ol.geom.Point(ol.proj.fromLonLat([lon, lat]))
+                          })
+                      ]
+                  }),
+                  style: iconStyle,
+                  type: 'marker'
+                });
+
+                map.addLayer(markerLayer)
+              }
+
+              //Capture zoom level and submit coordinates when above 10
+              map.on('moveend', function(e) {
+                var layers = [...map.getLayers().getArray()];
+                markerLayers = layers.filter(l => l.values_.type == "marker");
+                markerLayers.forEach((layer) => map.removeLayer(layer));
+                console.log(markerLayers);
+                var newZoom = map.getView().getZoom();
+                console.log('new zoom: ' + newZoom);
+                if(newZoom > 10) {
+                  var extent = map.getView().calculateExtent(map.getSize());
+                  extent = ol.proj.transformExtent(extent, 'EPSG:3857', 'EPSG:4326');
+                  //var bottomLeft = ol.toLonLat(ol.extent.getBottomLeft(extent));
+                  //var topRight = ol.toLonLat(ol.extent.getTopRight(extent));
+                  dataToSubmit = JSON.stringify({extent:extent});
+                  $.ajax({
+                    type: "POST",
+                    dataType: "json",
+                    url: "/getsignswithin",
+                    data: dataToSubmit,
+                    success: function(data) {
+                      console.log("Here");
+                      console.log(data);
+                      for(var i=0;i<data.length;i++) {
+                        addMarker(data[i].location.coordinates[0].$numberDecimal,data[i].location.coordinates[1].$numberDecimal);
+                      }
+                    },
+                    error: function(XMLHttpRequest, textStatus, errorThrown)
+                    { console.log("Error: " + errorThrown);  }
+                  });
+                }
+              });
+            </script>
+        </div>
+        <div class="col-1"></div>
+      </div>
+
+      {% if signs %}
         {% for sign in signs %}
             <div class="row sign-row sign-row-top">
               <div class="col sign-header-left">
@@ -167,5 +259,6 @@
             </div>
             <br/>
         {% endfor %}
+      {% endif %}
     </section>
 {% endblock content %}

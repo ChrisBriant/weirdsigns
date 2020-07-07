@@ -37,25 +37,57 @@
   </head>
 
   {% block body %}
+      <!-- Control Active Nav Item -->
+      <script type="text/javascript">
+        $(document).ready(function () {
+            var url = window.location.toString();
+            var menuItem = url.split('/');
+            menuItem =menuItem[menuItem.length-1];
+            //Deal with root url
+            if(menuItem === "") { menuItem = "home"; }
+            var navLink = $('.nav-link[href$="'+menuItem+'"]:first');
+            $('.nav-item').removeClass("active");
+            navLink.parent().addClass("active");
+        });
+      </script>
       <nav class="navbar navbar-expand-lg navbar-dark">
-        <a class="navbar-brand" href="#">Navbar</a>
+        <a class="navbar-brand" href="#">Weird Signs</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav">
-          <li class="nav-item active">
-            <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+          <li class="nav-item">
+            <a class="nav-link" href="/home">Home</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">Features</a>
+            <a class="nav-link" href="/latest">Latest</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Pricing</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link disabled" href="#">Disabled</a>
-          </li>
+          {% if current_user.is_authenticated %}
+            <li class="nav-item">
+              <a class="nav-link" href="/addsign">Add Sign</a>
+            </li>
+          {% endif %}
+          {% if not current_user.is_authenticated %}
+            <li class="nav-item">
+              <a class="nav-link" href="/register">Register</a>
+            </li>
+          {% endif %}
+          {% if not current_user.is_authenticated %}
+            <li class="nav-item">
+              <a class="nav-link" href="/forgot">Forgot Password</a>
+            </li>
+          {% endif %}
+          {% if current_user.is_authenticated %}
+            <li class="nav-item">
+              <a class="nav-link" href="/changepassword">Change Password</a>
+            </li>
+          {% endif %}
+          {% if current_user.is_authenticated %}
+            <li class="nav-item">
+              <a class="nav-link" href="/logout">Logout</a>
+            </li>
+          {% endif %}
         </ul>
         </div>
       </nav>
