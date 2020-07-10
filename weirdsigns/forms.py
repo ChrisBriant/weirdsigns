@@ -41,3 +41,7 @@ class ChangeForm(FlaskForm):
     password = PasswordField("New Password", validators=[DataRequired()])
     confirm_password = PasswordField("Confirm Password", validators=[DataRequired(),EqualTo("password")])
     submit = SubmitField("Change")
+
+class SignSubmitByIdForm(FlaskForm):
+    signids = StringField("idlist", validators=[DataRequired()])
+    submit = SubmitField("show")

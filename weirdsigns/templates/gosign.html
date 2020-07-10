@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+{% block content %}
+    <section>
+      <div class="row">
+        <div class="col-12 page-head"><h1>{{ sign.title }}</h1></div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <div class="card">
+            <div class="card-header">
+              &quot;{{ sign.title }}&quot; - by {{ sign.creator.username }} on {{ sign.created }}
+            </div>
+            <img class="card-img-top" src="/pictures/{{ sign.file }}" alt="{{ sign.title }}">
+          </div>
+        </div>
+      </div>
+    </section>
+{% endblock content %}

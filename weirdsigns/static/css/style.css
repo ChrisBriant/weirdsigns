@@ -265,6 +265,7 @@ input[type=submit] {
 .addsign .map {
   height: 200px;
   width: 100%;
+  text-align: center;
 }
 
 legend {
@@ -311,7 +312,7 @@ a:active {
 
 /* star ratings */
 .rating {
-    margin-top: 10px;
+    margin: 10px;
     overflow: hidden;
     display: inline-block;
     position: relative;
@@ -391,12 +392,15 @@ a:active {
 .card {
   width: 100%;
   background-color: #fff;
+  border: 0;
   margin: 0;
   padding: 0;
 }
 
 .card-img-top {
   width: 100%;
+  padding: 5%;
+  /*padding-right: 5%;*/
 }
 
 /*
@@ -450,8 +454,10 @@ a:active {
 }
 
 .card .map {
-  height: 400px;
-  width: 400px;
+  /*height: 300px;
+  width: 400px;*/
+  /*width:  30vw;*/
+  height: 100vh;
 }
 
 .card-map {
@@ -475,6 +481,11 @@ a:active {
   border-bottom-right-radius: 15px;
 }
 
+.sign-footer .col div {
+  display: inline-block;
+  vertical-align: middle;
+}
+
 .sign-container {
   border-radius: 15px;
   border: 1px solid #000;
@@ -486,11 +497,55 @@ a:active {
 /*----------------------------------------------*/
 
 #mainmap {
+  /*
   width: 800px;
-  height: 500px;
+  height: 500px;*/
+  width:  80vw;
+  height: 70vh;
+  text-align: center;
+  /*padding-left: 26px;*/
+}
+
+.mapcontainer {
   text-align: center;
 }
 
+.hide-on-render {
+  display:none;
+}
+
+.maparea input {
+  width:80vw;
+}
+
+.show-button-row {
+  margin-top: 0;
+  padding-top: 0;
+  /*padding-left: 26px;*/
+}
+
+/*
+.show-btn {
+  margin-left: 26px;
+  margin-right: 26px;
+}*/
+
+.show-button-row div {
+  padding-top: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.ol-popup {
+  background-color: rgba(255, 234, 167,.8);
+  padding: 10px;
+  border-radius: 15px;
+}
+
+#popup-content img {
+  max-width: 100px;
+}
 
 /*----------------------------------------------*/
 /*BUTTONS*/

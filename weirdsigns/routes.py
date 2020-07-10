@@ -22,6 +22,24 @@ def process_signs(signs):
                 s["already_rated"] = True
         else:
             s["already_rated"] = False
+        #Set rating classes for easy output
+        s['starclasses'] = []
+        if s['AverageRating']:
+            avgnearesthalf = round(s['AverageRating']*2)/2
+            if not avgnearesthalf.is_integer():
+                halfstar = True
+            else:
+                halfstar = False
+            avgwholepart = avgnearesthalf // 1
+            print(avgwholepart)
+            for i in range(1,6):
+                if i <= avgwholepart:
+                    s['starclasses'].append('fa fa-star')
+                elif halfstar:
+                    s['starclasses'].append('fa fa-star-half')
+                    halfstar = False
+                else:
+                    s['starclasses'].append('fa fa-star-o')
     return signs
 
 
@@ -88,7 +106,7 @@ def latest():
     ])
     #signs=list(signs)
     signs = process_signs(list(signs))
-    return render_template("latest.html",home=True, signs=signs)
+    return render_template("latest.html",home=True, signs=signs,title="latest")
 
 @app.route("/popular", methods=['GET', 'POST'])
 def popular():
@@ -152,12 +170,42 @@ def popular():
         { '$limit' : 10 }
     ])
     signs=process_signs(list(signs))
-    return render_template("latest.html",home=True, signs=signs)
+    return render_template("latest.html",home=True, signs=signs, title="Most Popular")
 
 
 @app.route("/bylocation", methods=['GET', 'POST'])
 def bylocation():
-    return render_template("bylocation.html", signs=None)
+    form = SignSubmitByIdForm()
+    signs = None
+    if form.validate_on_submit():
+        #objectids = [{'_id':ObjectId(id)} for id in form.signids.data.split(',')]
+        objectids = [ObjectId(id) for id in form.signids.data.split(',')]
+        #print('here',objectids)
+        #signs = db.signs.find(objectids)
+        #signs=db.signs.find({ "_id": {'$in': objectids} })
+        signs=db.signs.aggregate(
+                [ { '$match' : {'_id': {'$in': objectids} } },
+                { '$addFields' : {
+                        'title' : '$title',
+                        'creator': '$creator',
+                        'created': '$created',
+                        'wherefound' : '$wherefound',
+                        'ratings' : '$ratings',
+                        'long' : '$long',
+                        'lat' : '$lat',
+                        'location': '$location',
+                        'file' : '$file',
+                        'AverageRating' : { '$avg': "$ratings.rating" },
+                        'NumberOfRatings': { '$size': { "$ifNull": [ "$ratings", [] ] } }
+                    }
+                }]
+            )
+        signs=process_signs(list(signs))
+        print(signs)
+        return render_template("latest.html", signs=signs, title="View By Location")
+    else:
+        print(form.errors)
+        return render_template("bylocation.html", signs=signs, form=form)
 
 
 @app.route("/ratesign", methods=['POST'])
@@ -177,8 +225,6 @@ def rate_sign():
 def signs_within():
     print('getsignswithin')
     data = request.get_json(force=True)
-
-    print(data)
 
     signs = db.signs.find({
       'location': {
@@ -226,6 +272,30 @@ def addsign():
         return redirect(url_for('home'))
     return render_template('addsign.html', form=form)
 
+
+@app.route('/gosign/<string:object_id>', methods=['GET', 'POST'])
+def gosign(object_id):
+    #sign = db.signs.find_one({'_id':ObjectId(object_id)})
+    sign=db.signs.aggregate(
+            [ { '$match' : {'_id': ObjectId(object_id) } },
+            { '$addFields' : {
+                    'title' : '$title',
+                    'creator': '$creator',
+                    'created': '$created',
+                    'wherefound' : '$wherefound',
+                    'ratings' : '$ratings',
+                    'long' : '$long',
+                    'lat' : '$lat',
+                    'location': '$location',
+                    'file' : '$file',
+                    'AverageRating' : { '$avg': "$ratings.rating" },
+                    'NumberOfRatings': { '$size': { "$ifNull": [ "$ratings", [] ] } }
+                }
+            }]
+        )
+    print(sign)
+    sign = process_signs(list(sign))[0]
+    return render_template('gosign.html', sign=sign)
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():

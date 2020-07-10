@@ -60,20 +60,20 @@
       </script>
       <div class="row">
 
-        <div class="col-12 page-head"><h1>Latest Signs</h1></div>
+        <div class="col-12 page-head"><h1>{{ title }}</h1></div>
       </div>
 
         {% for sign in signs %}
             <div class="row sign-row sign-row-top">
               <div class="col sign-header-left">
-                &quot;{{ sign.title }}&quot; - by {{ sign.creator.username }} on {{ sign.created }}
+                <a href="gosign/{{ sign._id }}">&quot;{{ sign.title }}&quot</a>; - by {{ sign.creator.username }} on {{ sign.created }}
               </div>
               <div class="col sign-header-right">
                 {{ sign.wherefound }}
               </div>
             </div>
             <div class="row sign-row">
-              <div class="col-sm-6 align-items-stretch sign-pic">
+              <div class="col align-items-stretch sign-pic">
                 <div class="card">
                   <!--
                   <div class="card-header">
@@ -83,7 +83,7 @@
                   <img class="card-img-top" src="/pictures/{{ sign.file }}" alt="{{ sign.title }}">
                 </div>
               </div>
-              <div class="col-sm-6 align-items-stretch sign-map">
+              <div class="col align-items-stretch sign-map">
                 <div class="card">
                   <!--
                   <div class="card-header">
@@ -146,9 +146,9 @@
               <div class="col">
                 {% if current_user.is_authenticated %}
                   {% if sign.already_rated %}
-                    Rated <i class="fa fa-check" aria-hidden="true"></i>
+                    <div>Rated <i class="fa fa-check" aria-hidden="true"></i></div>
                   {% else %}
-                    Rate:
+                    <div>Rate:</div>
                     <div id="rating_{{  sign._id }}" class="rating" style="display:inline-block">
                       <i class="fa fa-star-o star"></i>
                       <i class="fa fa-star-o star" ></i>
@@ -163,6 +163,13 @@
                 {% endif %}
               </div>
               <div class="col">
+                <div>Average Rating:</div>
+                <div class="rating" style="display:inline-block">
+                  {% for star in sign.starclasses %}
+                    <i class="{{ star }}"></i>
+                  {% endfor %}
+                </div>
+                <div>Votes: {{ sign.NumberOfRatings }}</div>
               </div>
             </div>
             <br/>
