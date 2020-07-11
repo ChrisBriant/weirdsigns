@@ -1,9 +1,10 @@
-    <section>
+    <section class="section-login">
       <div class="row">
         <div class="col-sm-12 login">
           <form method="POST" action="/home">
             {{ form.hidden_tag() }} <!-- csrf token -->
             <h1>LOGIN</h1>
+            {% include 'messages.html' %}
             <fieldset class="form-group">
               <legend class="mb-4">Login below with your email address and password</legend>
               <div class="row">
@@ -21,7 +22,7 @@
             </div><br/>
             <legend><a href="/forgot">Forgot Password?</a></legend>
             <div class="pt-3">
-              <small class="text-muted">
+              <small class="form-text-muted">
                 Need An Account? <a class="ml-2" href="{{ url_for('register') }}">Sign up now</a>
               </small>
             </div>

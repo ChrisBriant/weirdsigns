@@ -2,6 +2,9 @@
 {% block content %}
     <section>
       <div class="row">
+        <div class="col-12 page-head"><h1>Register</h1></div>
+      </div>
+      <div class="row">
         <div class="col-sm-3"></div>
         <div class="col-sm-6 register">
           <div class="dialog">
@@ -9,6 +12,12 @@
             {{ form.hidden_tag() }} <!-- csrf token -->
             <fieldset class="form-group">
               <legend class="mb-4">Join Today</legend>
+              {% if error_message %}
+                <div class="error-message">{{ error_message }}</div><br/>
+              {% endif %}
+              {% if success_message %}
+                <div class="success-message">{{ success_message }}</div><br/>
+              {% endif %}
                 <div class="row">
                   <div class="col-sm-6">{{ form.username.label(class="form-control-label") }}</div>
                   <div class="col-sm-6">{{ form.username(class="form-control-sm") }}</div>
@@ -25,13 +34,28 @@
                   <div class="col-sm-6">{{ form.confirm_password.label(class="form-control-label") }}</div>
                   <div class="col-sm-6">{{ form.confirm_password(class="form-control-sm") }}</div>
                 </div><br/>
+                {% if form.confirm_password.errors %}
+                  <script type="text/javascript">
+                    $('document').ready(function() {
+                      $('#confirm_password').addClass('error-message');
+                    });
+                  </script>
+                  {% for e in form.confirm_password.errors %}
+                    <div class="row">
+                      <div class="col-sm-6"></div>
+                      <div class="col-sm-6"><p class="error-text">{{ e }}</p></div>
+                    </div>
+                  {% endfor %}
+                {% endif %}
                 <div class="tandc">
                   <p><strong>Terms and Conditions</strong></p>
-                  <p>By registering for this site, I agree for the website to store my email address. This is used only for the purpose of user verifitcation
-                    and will not be displayed anywhere within the app.</p>
-                  <p>I understand that the author of this website is not responsible for any of the content posted by other users.</p>
-                  <p>The author reserves the right to remove my account at any point and without warning.</p>
-                  <p>I can erase my user account and associated data at any time by clicking delete account from the home page.</p>
+                  <small>
+                    <p>By registering for this site, I agree for the website to store my email address. This is used only for the purpose of user verifitcation
+                      and will not be displayed anywhere within the app.</p>
+                    <p>I understand that the author of this website is not responsible for any of the content posted by other users.</p>
+                    <p>The author reserves the right to remove my account at any point and without warning.</p>
+                    <p>I can erase my user account and associated data at any time by clicking delete account from the home page.</p>
+                  </small>
                 </div>
                 <div class="row">
                   <div class="col-sm-6">{{ form.iagree.label(class="form-control-label") }}</div>
@@ -43,7 +67,7 @@
             </div>
           </form>
           <div class="border-top pt-3">
-            <small class="text-muted">
+            <small class="form-text-muted">
               Already Have An Account? <a class="ml-2" href="{{ url_for('login') }}">Sign in</a>
             </small>
           </div>

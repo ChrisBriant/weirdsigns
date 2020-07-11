@@ -1,18 +1,123 @@
 {% extends "layout.html" %}
 {% block content %}
-    <section>
+    <section class="section-onesign">
       <div class="row">
         <div class="col-12 page-head"><h1>{{ sign.title }}</h1></div>
       </div>
       <div class="row">
-        <div class="col">
+        <div class="col-2"></div>
+        <div class="col-8 single-card">
           <div class="card">
             <div class="card-header">
-              &quot;{{ sign.title }}&quot; - by {{ sign.creator.username }} on {{ sign.created }}
+              <div class="row">
+                <div class="col">
+                  &quot;{{ sign.title }}&quot; - by {{ sign.creator.username }} on {{ sign.created }}
+                </div>
+                <div class="col">
+                  {{ sign.wherefound }}
+                </div>
+              </div>
             </div>
-            <img class="card-img-top" src="/pictures/{{ sign.file }}" alt="{{ sign.title }}">
+            <div class="row">
+              <div class="col single-image"><img class="card-img-top" src="/pictures/{{ sign.file }}" alt="{{ sign.title }}"></div>
+              <div class="col">
+                <div class="card-text card-map-single">
+                  <div id="map{{ sign._id }}" class="map-single"></div>
+                    <script type="text/javascript">
+                      var map = new ol.Map({
+                        target: 'map{{ sign._id }}',
+                        layers: [
+                          new ol.layer.Tile({
+                            source: new ol.source.OSM()
+                          })
+                        ],
+                        view: new ol.View({
+                          //center: ol.proj.fromLonLat([37.41, 8.82]),
+                          center: ol.proj.fromLonLat([{{ sign.long }},{{ sign.lat }}]),
+                          zoom: 12
+                        }),
+                        controls: ol.control.defaults({
+                          attributionOptions: {
+                            className: 'my-ol-attribution'
+                          },
+                          zoom:false,
+                        }),
+                        interactions: ol.interaction.defaults( {
+                          doubleClickZoom: false,
+                          dragAndDrop: false,
+                          dragPan: false,
+                          keyboardPan: false,
+                          keyboardZoom: false,
+                          mouseWheelZoom: false,
+                          pointer: false,
+                          select: false
+                        })
+                      });
+
+                      //Make the pin icon
+                      var iconStyle = new ol.style.Style({
+                        image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
+                          anchor: [0.5, 46],
+                          anchorXUnits: 'fraction',
+                          anchorYUnits: 'pixels',
+                          opacity: 0.75,
+                          src: '../static/img/mappin.png'
+                        }))
+                      });
+
+                      markerLayer = new ol.layer.Vector({
+                        source: new ol.source.Vector({
+                            features: [
+                                new ol.Feature({
+                                  //geometry: new ol.geom.Point(ol.proj.fromLonLat([{{ sign.long }}, {{ sign.lat }}]))
+                                  geometry: new ol.geom.Point(map.getView().getCenter())
+                                })
+                            ]
+                        }),
+                        style: iconStyle
+                      });
+
+                      map.addLayer(markerLayer)
+                    </script>
+                  </div>
+              </div>
+            </div>
+            <div class="card-footer">
+              <div class="row">
+                <div class="col">
+                  {% if current_user.is_authenticated %}
+                    {% if sign.already_rated %}
+                      <div>Rated <i class="fa fa-check" aria-hidden="true"></i></div>
+                    {% else %}
+                      <div>Rate:</div>
+                      <div id="rating_{{  sign._id }}" class="rating" style="display:inline-block">
+                        <i class="fa fa-star-o star"></i>
+                        <i class="fa fa-star-o star" ></i>
+                        <i class="fa fa-star-o star"></i>
+                        <i class="fa fa-star-o star"></i>
+                        <i class="fa fa-star-o star"></i>
+                      </div>
+                      <div class="rating">
+                        <a id="{{ sign._id }}" class="submit-rating" href="#" style="display:none;"><i class="fa fa-check-circle-o"></i></a><br>
+                      </div>
+                    {% endif %}
+                  {% endif %}
+                </div>
+                <div class="col">
+                  <div>Average Rating:</div>
+                  <div class="rating" style="display:inline-block">
+                    {% for star in sign.starclasses %}
+                      <i class="{{ star }}"></i>
+                    {% endfor %}
+                  </div>
+                  <div>Votes: {{ sign.NumberOfRatings }}</div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
+        <div class="col-2"></div>
+
       </div>
     </section>
 {% endblock content %}

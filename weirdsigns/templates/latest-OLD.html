@@ -1,0 +1,178 @@
+{% extends "layout.html" %}
+{% block content %}
+
+
+    <section>
+      <script type="text/javascript">
+        ratingsChanged = false;
+
+        $('document').ready(function() {
+          $(window).resize(function () {
+             //$('#log').append('<div>Handler for .resize() called.</div>');
+                var canvasheight=$('.map').parent().css('height');
+                var canvaswidth=$('.map').parent().css('width');
+
+                $('.map').css("height", canvasheight);
+                $('.map').css("width", canvaswidth);
+          });
+
+          $(".star").on('click', function() {
+            ratingsChanged = true;
+
+            if($(this).hasClass("fa-star-o")) {
+              $(this).removeClass("fa-star-o");
+              $(this).addClass("fa-star");
+              //Make previous selected
+              $(this).prevUntil(".rating").removeClass("fa-star-o");
+              $(this).prevUntil(".rating").addClass("fa-star");
+            } else if ($(this).hasClass("fa-star")) {
+              $(this).parent().children().each(function () {
+                $(this).removeClass("fa-star");
+                $(this).addClass("fa-star-o");
+              });
+              $(this).prevUntil(".rating").removeClass("fa-star");
+              $(this).prevUntil(".rating").addClass("fa-star-o");
+            }
+
+            $(this).parent().parent().find("a").css('display','inline-block');
+          });
+
+          $(".submit-rating").click(function(e){
+
+            e.preventDefault();
+            var signId = $(this).attr('id').toString();
+            var rating = $('#rating_'+ signId +' .fa-star').length.toString();
+            var dataToSubmit = JSON.stringify({ signId:signId,rating:rating });
+            //var rating = $(this).parent().parent().firstChild().find('fa-star');
+            $.ajax({
+              type: "POST",
+              dataType: "application/json",
+              url: "/ratesign",
+              data: dataToSubmit,
+              success: function(data) {
+                console.log(data);
+              }
+            });
+          });
+
+
+        });
+      </script>
+      <div class="row">
+
+        <div class="col-12 page-head"><h1>{{ title }}</h1></div>
+      </div>
+
+        {% for sign in signs %}
+            <div class="row sign-row sign-row-top">
+              <div class="col sign-header-left">
+                <a href="gosign/{{ sign._id }}">&quot;{{ sign.title }}&quot</a>; - by {{ sign.creator.username }} on {{ sign.created }}
+              </div>
+              <div class="col sign-header-right">
+                {{ sign.wherefound }}
+              </div>
+            </div>
+            <div class="row sign-row">
+              <div class="col align-items-stretch sign-pic">
+                <div class="card">
+                  <!--
+                  <div class="card-header">
+                    &quot;{{ sign.title }}&quot; - by {{ sign.creator.username }} on {{ sign.created }}
+                  </div>
+                  -->
+                  <img class="card-img-top" src="/pictures/{{ sign.file }}" alt="{{ sign.title }}">
+                </div>
+              </div>
+              <div class="col align-items-stretch sign-map">
+                <div class="card">
+                  <!--
+                  <div class="card-header">
+                    {{ sign.wherefound }}
+                  </div>
+                  -->
+                  <div class="card-text card-map">
+                  <div id="map{{ sign._id }}" class="map"></div>
+                    <script type="text/javascript">
+                      var map = new ol.Map({
+                        target: 'map{{ sign._id }}',
+                        layers: [
+                          new ol.layer.Tile({
+                            source: new ol.source.OSM()
+                          })
+                        ],
+                        view: new ol.View({
+                          //center: ol.proj.fromLonLat([37.41, 8.82]),
+                          center: ol.proj.fromLonLat([{{ sign.long }},{{ sign.lat }}]),
+                          zoom: 12
+                        }),
+                        controls: ol.control.defaults({
+                          attributionOptions: {
+                            className: 'my-ol-attribution'
+                          },
+                          zoom:false
+                        })
+                      });
+
+                      //Make the pin icon
+                      var iconStyle = new ol.style.Style({
+                        image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
+                          anchor: [0.5, 46],
+                          anchorXUnits: 'fraction',
+                          anchorYUnits: 'pixels',
+                          opacity: 0.75,
+                          src: '../static/img/mappin.png'
+                        }))
+                      });
+
+                      markerLayer = new ol.layer.Vector({
+                        source: new ol.source.Vector({
+                            features: [
+                                new ol.Feature({
+                                  //geometry: new ol.geom.Point(ol.proj.fromLonLat([{{ sign.long }}, {{ sign.lat }}]))
+                                  geometry: new ol.geom.Point(map.getView().getCenter())
+                                })
+                            ]
+                        }),
+                        style: iconStyle
+                      });
+
+                      map.addLayer(markerLayer)
+                    </script>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row sign-footer">
+              <div class="col">
+                {% if current_user.is_authenticated %}
+                  {% if sign.already_rated %}
+                    <div>Rated <i class="fa fa-check" aria-hidden="true"></i></div>
+                  {% else %}
+                    <div>Rate:</div>
+                    <div id="rating_{{  sign._id }}" class="rating" style="display:inline-block">
+                      <i class="fa fa-star-o star"></i>
+                      <i class="fa fa-star-o star" ></i>
+                      <i class="fa fa-star-o star"></i>
+                      <i class="fa fa-star-o star"></i>
+                      <i class="fa fa-star-o star"></i>
+                    </div>
+                    <div class="rating">
+                      <a id="{{ sign._id }}" class="submit-rating" href="#" style="display:none;"><i class="fa fa-check-circle-o"></i></a><br>
+                    </div>
+                  {% endif %}
+                {% endif %}
+              </div>
+              <div class="col">
+                <div>Average Rating:</div>
+                <div class="rating" style="display:inline-block">
+                  {% for star in sign.starclasses %}
+                    <i class="{{ star }}"></i>
+                  {% endfor %}
+                </div>
+                <div>Votes: {{ sign.NumberOfRatings }}</div>
+              </div>
+            </div>
+            <br/>
+        {% endfor %}
+    </section>
+{% endblock content %}

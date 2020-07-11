@@ -3,10 +3,12 @@ from wtforms.validators import ValidationError
 from weirdsigns import app,db, bcrypt
 from weirdsigns.forms import *
 from weirdsigns.models import User
+from weirdsigns.email import sendconfirmation, sendforgot
 from bson import ObjectId, Decimal128
 from flask_login import login_user, current_user, logout_user, login_required
 import os, secrets, datetime, uuid
 from bson.json_util import dumps
+
 
 #Process the sign data
 def process_signs(signs):
@@ -299,14 +301,17 @@ def gosign(object_id):
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
+    error_message = None
+    success_message = None
     if current_user.is_authenticated:
         logout_user()
         return redirect(url_for("home"))
     form = RegistrationForm()
     if form.validate_on_submit():
+        #sendtestmessage('me@test.com',form.email.data)
         #Check username and password unique in database
         if db.users.find_one({"$or":[{"username":{'$regex': form.username.data, '$options': '-i'}},{"email":{'$regex': form.email.data, '$options': '-i'}}]}):
-            flash(f"An account with this username or password already exists","danger")
+            error_message = "An account with this username or password already exists"
         else:
             #proceed
             hashed_password = bcrypt.generate_password_hash(form.password.data).decode("utf-8")
@@ -315,36 +320,45 @@ def register():
                             "hash":hash,"dateregistered":datetime.datetime.now()}
             db.users.insert_one(user_dict)
             #Send verifitcation email
-            #sendconfirmation(form.email.data, hash, form.username.data)
-            flash(f"Account created for { form.username.data }!","success")
-            flash(f"Please check your email and click on the link to verify your email address","warning")
+            sendconfirmation(form.email.data, hash, form.username.data)
+            success_message = "Account created for " + form.username.data +"!\n" + \
+                "Please check your email and click on the link to verify your email address"
     elif form.errors:
-        errorstring = "You have the following errors on the form:"
+        print(form.errors)
+        error_message = "You have errors on the form"
+        """
         flash(errorstring,"danger")
         errorvals = [x[0] for x in list(form.errors.values())]
         errorlist = list(map(lambda x, y: x+ ': ' +y, list(form.errors.keys()), errorvals  ))
         for error in errorlist:
             flash(error,"danger")
             errorstring = errorstring + error
-    return render_template("register.html", title="Register", form=form)
+        """
+    return render_template("register.html", title="Register", form=form, error_message=error_message,success_message=success_message)
 
 @app.route("/confirm/<string:confirm_hash>")
 def confirm(confirm_hash):
-    user = db.user.find_one({"hash":confirm_hash})
+    success_message = None
+    error_message = None
+    user = db.users.find_one({"hash":confirm_hash})
+    print("hash",confirm_hash)
+    form = LoginForm()
     if user:
         if user["dateregistered"] + datetime.timedelta(hours=1) > datetime.datetime.now():
             #Enable Account
-            db.user.update_one(   { "_id": user["_id"] },
+            db.users.update_one(   { "_id": user["_id"] },
                                   { "$set": { "enabled": True} }
             )
-            db.user.update_one(   { "_id": user["_id"] },
+            db.users.update_one(   { "_id": user["_id"] },
                                   { "$unset": { "hash": ""} }
             )
-            flash("Account confrimed, please login below","success")
+            SUCCESS_MESSAGE="Account confrimed, please login below"
+            flash(u"Account confrimed, please login below","success")
         else:
-            db.user.delete_one( { "_id": user["_id"] } )
-            flash("Sorry account has expired","danger")
-    return redirect(url_for("login"))
+            db.users.delete_one( { "_id": user["_id"] } )
+            ERROR_MESSAGE = "Sorry account has expired"
+            flash(u"Sorry account has expired","danger")
+    return redirect(url_for("home",error_message=error_message,success_message=success_message,home=True))
 
 @app.route("/forgot/<string:confirm_hash>", methods=["GET","POST"])
 @app.route("/forgot", methods=["GET","POST"])
@@ -414,7 +428,7 @@ def change():
                                   { "$set": { "password": hashed_password} }
             )
             flash("Password Rest, please login below","success")
-            return redirect(url_for("home"))
+            #return redirect(url_for("home"))
         else:
             flash("Password change unsuccessfull, please check your old password and try again","danger")
     elif form.errors:
@@ -434,7 +448,7 @@ def login():
             login_user(user, remember=form.remember.data)
             return redirect(url_for("home"))
         else:
-            flash(f"Login unsuccessful!","danger")
+            flash("Login unsuccessful!","danger")
     else:
         errors = [form.errors[k] for k in form.errors.keys()]
         flash(errors,"danger")
@@ -443,4 +457,4 @@ def login():
 @app.route("/logout")
 def logout():
     logout_user()
-    return redirect(url_for("login"))
+    return redirect(url_for("home"))

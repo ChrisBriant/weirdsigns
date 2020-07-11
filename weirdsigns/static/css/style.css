@@ -67,7 +67,27 @@ footer {
 
 .page-head {
   text-align: center;
+  margin: 10px 0;
 }
+
+.page-head:before {
+    content: "";
+    display: block;
+    margin: 0 auto;
+    width: 60%;
+    border-bottom: 2px solid #fff;
+}
+
+.page-head:after {
+    content: "";
+    display: block;
+    margin: 0 auto;
+    width: 60%;
+    border-top: 2px solid #fff;
+}
+
+
+
 
 /*----------------------------------------------*/
 /*HEADER*/
@@ -118,6 +138,57 @@ header {
 
 }
 
+/*
+.nav-selected {
+  border-top: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+}*/
+
+.nav-selected:before {
+    content: ""; /* This is necessary for the pseudo element to work. */
+    display: block; /* This will put the pseudo element on its own line. */
+    margin: 0 auto; /* This will center the border. */
+    width: 60%; /* Change this to whatever width you want. */
+    border-top: 2px solid #fff; /* This creates the border. Replace black with whatever color you want. */
+}
+
+.nav-selected:after {
+    content: ""; /* This is necessary for the pseudo element to work. */
+    display: block; /* This will put the pseudo element on its own line. */
+    margin: 0 auto; /* This will center the border. */
+    width: 60%; /* Change this to whatever width you want. */
+    border-bottom: 2px solid #fff; /* This creates the border. Replace black with whatever color you want. */
+}
+
+/*
+.nav-unselected {
+  margin-bottom: 2px;
+  margin-top: 2px;
+}*/
+
+.nav-unselected:before {
+    content: ""; /* This is necessary for the pseudo element to work. */
+    display: block; /* This will put the pseudo element on its own line. */
+    margin: 0 auto; /* This will center the border. */
+    width: 60%; /* Change this to whatever width you want. */
+    margin-top: 2px; /* This creates the border. Replace black with whatever color you want. */
+}
+
+.nav-unselected:after {
+    content: ""; /* This is necessary for the pseudo element to work. */
+    display: block; /* This will put the pseudo element on its own line. */
+    margin: 0 auto; /* This will center the border. */
+    width: 60%; /* Change this to whatever width you want. */
+    margin-bottom: 2px; /* This creates the border. Replace black with whatever color you want. */
+}
+
+.section-login {
+  margin: 0;
+  padding: 0 10px;
+  min-height: 500px;
+}
+
+
 /*----------------------------------------------*/
 /*HEADINGS*/
 /*----------------------------------------------*/
@@ -133,7 +204,8 @@ h1 {
   color: #fff;
   font-size: 240%;
   word-spacing: 4px;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
+  margin-top: 10px;
   letter-spacing: 1px;
 }
 
@@ -173,6 +245,16 @@ header .hero-login {
 
 header .hero-login-col {
   padding: 3%;
+}
+
+header .hero-login-col a:active,
+header .hero-login-col a:link,
+header .hero-login-col a:visited {
+  color: #012969;
+}
+
+.form-text-muted {
+  color: #404040;
 }
 
 .herotitle {
@@ -250,6 +332,11 @@ input[type=submit] {
   height: 46px;
 }
 
+input[type=checkbox] {
+  font-size: 20px;
+  height: 20px;
+}
+
 .login, .dialog {
   border: 1px solid #2e2e2e;
   padding: 10px;
@@ -258,8 +345,17 @@ input[type=submit] {
 .register,
 .addsign {
   background-color: rgba(255, 255, 255,.5);
-  padding: 10px;
+  padding: 20px;
   border-radius: 15px;
+}
+
+.addsign a:active,
+.addsign a:link,
+.addsign a:visited,
+.register a:active,
+.register a:link,
+.register a:visited {
+  color: #012969;
 }
 
 .addsign .map {
@@ -276,6 +372,19 @@ legend {
 .error-message {
   background-color: #ff7a70;
   border: 1px solid #910a00;
+  color: #910a00;
+  padding: 2px;
+}
+
+.success-message {
+  background-color: #7ed693;
+  border: 1px solid #006117;
+  color: #006117;
+  padding: 2px;
+}
+
+
+.error-text {
   color: #910a00;
 }
 /*----------------------------------------------*/
@@ -481,6 +590,7 @@ a:active {
   border-bottom-right-radius: 15px;
 }
 
+.card-footer .col div,
 .sign-footer .col div {
   display: inline-block;
   vertical-align: middle;
@@ -548,313 +658,58 @@ a:active {
 }
 
 /*----------------------------------------------*/
+/*INDIVIDUAL SIGN*/
+/*----------------------------------------------*/
+
+.section-onesign .card-header {
+  background-color: #01104a;
+  color: #fff;
+  text-align: center;
+}
+
+.section-onesign .card {
+  border-radius: 15px;
+}
+
+.section-onesign .card-header {
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+}
+
+.section-onesign .card-footer {
+  border-bottom-left-radius: 15px;
+  border-bottom-right-radius: 15px;
+}
+
+.section-onesign .card-footer-text {
+  color: #FFCA00;
+}
+
+
+.card .map-single {
+  height: 60vh;
+}
+
+/*
+.card-map-single {
+  max-height: 400px;
+}*/
+
+.single-image {
+  height: 60vh;
+}
+
+.single-image img {
+  max-height: 400px;
+}
+
+.card-footer {
+  background-color: #404040;
+  color: #fff;
+  min-height: 40px;
+}
+/*----------------------------------------------*/
 /*BUTTONS*/
 /*----------------------------------------------*/
-/*
-
-.btn:link,
-.btn:visited,
-input[type=submit] {
-  display: inline-block;
-  padding: 10px 30px;
-  font-weight: 300;
-  text-decoration: none;
-  border-radius: 200px;
-  -webkit-transition: background-color 0.2s, border 0.2s, color 0.2s;
-  transition: background-color 0.2s, border 0.2s, color 0.2s;
-}
-
-
-.btn-full:link,
-.btn-full:visited,
-input[type=submit] {
-  border: 1px solid #e67e22;
-  background-color: #e67e22;
-  color: #fff;
-  margin-right: 15px;
-}
-
-.btn-ghost:link,
-.btn-full:visited {
-  border: 1px solid #e67e22;
-  color: #e67e22;
-}
-
-
-.btn:hover,
-.btn:active,
-input[type=submit]:hover,
-input[type=submit]:active {
-  background-color: #ad5f1a;
-}
-
-
-.btn-full:hover,
-.btn-full:active {
-  border: 1px solid #ad5f1a;
-}
-
-.btn-ghost:hover,
-.btn-full:active {
-  border: 1px solid #ad5f1a;
-  color: #fff;
-}
-
-*/
-/*----------------------------------------------*/
-/*FEATURES*/
-/*----------------------------------------------*/
-
-.section-features .long-copy{
-  margin-bottom: 30px;
-}
-
-
-/*----------------------------------------------*/
-/*MEALS*/
-/*----------------------------------------------*/
-
-.meals-showcase {
-  list-style: none;
-  width: 100%;
-}
-
-.meals-showcase li {
-  display: block;
-  float: left;
-  width: 25%;
-}
-
-.meal-photo {
-  margin: 0;
-  padding: 0;
-  overflow:hidden;
-  background-color: #000;
-}
-
-.meal-photo img{
-  opacity: 0.7;
-  width: 100%;
-  height: auto;
-  -webkit-transform: scale(1.15);
-          transform: scale(1.15);
-
-}
-
-.meal-photo img:hover{
-  -webkit-transform: scale(1.03);
-          transform: scale(1.03);
-  opacity: 1;
-  -webkit-transition: opacity 0.5s, -webkit-transform 0.5s;
-  transition: opacity 0.5s, -webkit-transform 0.5s;
-  transition: transform 0.5s, opacity 0.5s;
-  transition: transform 0.5s, opacity 0.5s, -webkit-transform 0.5s;
-}
-
-.section-meals {
-  padding:0;
-}
-
-/*----------------------------------------------*/
-/*HOW IT WORKS*/
-/*----------------------------------------------*/
-
-.section-steps {
-  background-color: #fff;
-}
-
-.steps-box:first-child {
-  text-align: right;
-  padding-right: 3%;
-  margin-top: 30px;
-}
-
-.steps-box:last-child {
-  padding-left: 3%;
-  margin-top: 70px;
-
-}
-
-.app-screen {
-  width: 40%;
-}
-
-.works-step {
-  margin-bottom: 50px;
-}
-
-.works-step:last-of-type {
-  margin-bottom: 80px;
-}
-
-.works-step div:first-child {
-  color: #e67e22;
-  border: 2px solid #e67e22;
-  display: inline-block;
-  border-radius: 50%;
-  text-align: center;
-  width: 55px;
-  height: 55px;
-  padding: 5px;
-  float: left;
-  font-size: 150%;
-  margin-right: 25px;
-}
-
-
-.btn-app:link,
-.btn-app:visited {
-  border: 0;
-}
-
-.btn-app img {
-  height: 50px;
-  margin-right: 10px;
-}
-
-
-/*----------------------------------------------*/
-/*HOW IT WORKS*/
-/*----------------------------------------------*/
-
-.box img {
-  width: 100%;
-  height: auto;
-  margin-bottom: 15px;
-}
-
-.city-feature {
-  margin-bottom: 5px;
-}
-
-
-/*----------------------------------------------*/
-/*testimonials*/
-/*----------------------------------------------*/
-
-.section-testimonials {
-  background-image: -webkit-gradient(linear,left top, left bottom,from(rgba(0, 0, 0, 0.8)),to(rgba(0, 0, 0, 0.8))), url(img/bgcust.jpg);
-  background-image: linear-gradient(rgba(0, 0, 0, 0.8),rgba(0, 0, 0, 0.8)), url(img/bgcust.jpg);
-  background-size: cover;
-  background-color: #000;
-  color: #fff;
-  background-attachment: fixed;
-}
-
-blockquote {
-  padding: 2%;
-  font-style: italic;
-}
-
-blockquote::before {
-  content: open-quote;
-  display: inline-block;
-}
-
-blockquote::after {
-  content: close-quote;
-}
-
-cite {
-  font-size: 90%;
-  margin-top: 25px;
-}
-
-
-cite img {
-  height: 50px;
-  border-radius: 50%;
-  margin-right: 10px;
-  display: inline-block;
-  vertical-align: middle;
-}
-
-
-/*----------------------------------------------*/
-/*testimonials*/
-/*----------------------------------------------*/
-
-.section-plans {
-  background-color: #f4f4f4;
-
-}
-
-.plan-box {
-  background-color: #fff;
-  border-radius: 5px;
-  width: 90%;
-  margin-left: 5%;
-
-}
-
-.plan-box div {
-  padding: 15px;
-  border: 1px solid #e8e8e8;
-}
-
-.plan-price {
-  font-size: 300%;
-  margin-bottom: 10px;
-  font-weight: 100;
-  color: #e67e22;
-}
-
-.plan-price span {
-  font-size: 30%;
-  font-weight: 300;
-}
-
-.plan-price-meal {
-  font-size: 80%;
-}
-
-.plan-box ul {
-
-  list-style: none;
-}
-
-.plan-box ul li {
-  padding: 5px 0px;
-}
-
-.plan-box div:first-child {
-  background-color: #fcfcfc;
-  border-top-left-radius: 5px;
-  border-top-right-radius: 5px;
-  -webkit-box-shadow: 0 2px 2px #e3e3e3;
-          box-shadow: 0 2px 2px #e3e3e3;
-}
-
-
-.plan-box div:last-child {
-  text-align: center;
-  border: 0;
-}
-
-/*----------------------------------------------*/
-/*contactform*/
-/*----------------------------------------------*/
-
-.contact-form {
-  width: 60%;
-  margin: 0 auto;
-}
-
-input[type=text],input[type=email], select, textarea {
-  width: 100%;
-  padding: 7px;
-  border-radius: 3px;
-  border: 1px solid #ccc;
-}
-
-textarea {
-  height: 100px;
-}
-
-input[type=checkbox] {
-  margin: 10px 5px 10px 0px;
-}
-
-
 
 *:focus { outline:none; }
