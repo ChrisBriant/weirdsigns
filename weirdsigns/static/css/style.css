@@ -217,10 +217,11 @@ h2 {
   letter-spacing: 1px;
 }
 
+
 h2::after {
   display: block;
   height: 2px;
-  background-color: #e67e22;
+  background-color: #262626;
   content: " ";
   width: 100px;
   margin: 0 auto;
@@ -661,6 +662,10 @@ a:active {
 /*INDIVIDUAL SIGN*/
 /*----------------------------------------------*/
 
+.section-onesign {
+  margin-right: 14px;
+}
+
 .section-onesign .card-header {
   background-color: #01104a;
   color: #fff;
@@ -708,6 +713,53 @@ a:active {
   color: #fff;
   min-height: 40px;
 }
+
+.comment-area {
+  /*height: 65%;*/
+  height: 300px;
+}
+
+.add-comment:before {
+  content: "";
+  display: block;
+  margin: 0 auto;
+  width: 100px;
+  padding-bottom: 5px;
+  border-top: 2px solid #262626;;
+}
+
+.add-comment {
+  text-align: center;
+}
+
+.comment-text-area {
+  width: 100%;
+  padding: 10px;
+}
+
+#comment-form {
+  display: none;
+}
+
+.comment-item {
+  border-radius: 15px;
+  background-color: #fff;
+}
+
+.comment-item p {
+  margin: 10px;
+}
+
+.comment-text {
+  color: #4361cc;
+}
+
+/*
+.comment-area .col {
+  overflow-y: auto;
+}*/
+
+
 /*----------------------------------------------*/
 /*BUTTONS*/
 /*----------------------------------------------*/

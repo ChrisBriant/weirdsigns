@@ -5,25 +5,48 @@
         <div class="col-12 page-head"><h1>Forgot</h1></div>
       </div>
       {% if confirmed %}
-        <form method="POST" action="">
-          {{ form.hidden_tag() }} <!-- csrf token -->
-            <div class="row">
-              <div class="col-sm-3">{{ form.password.label(class="form-control-label") }}</div>
-              <div class="col-sm-3">{{ form.password(class="form-control-sm") }}</div>
-            </div><br/>
-            <div class="row">
-              <div class="col-sm-3">{{ form.confirm_password.label(class="form-control-label") }}</div>
-              <div class="col-sm-3">{{ form.confirm_password(class="form-control-sm") }}</div>
-            </div><br/>
-            <div class="row">
-              <div class="col-sm-3">{{ form.submit(class="btn btn-primary") }}</div>
+        <div class="row">
+          <div class="col-sm-3"></div>
+          <div class="col-sm-6 register">
+            <div class="dialog">
+              {% include 'messages.html' %}
+              <form method="POST" action="">
+                {{ form.hidden_tag() }} <!-- csrf token -->
+                  <div class="row">
+                    <div class="col-sm-6">{{ form.password.label(class="form-control-label") }}</div>
+                    <div class="col-sm-6">{{ form.password(class="form-control-sm") }}</div>
+                  </div><br/>
+                  <div class="row">
+                    <div class="col-sm-6">{{ form.confirm_password.label(class="form-control-label") }}</div>
+                    <div class="col-sm-6">{{ form.confirm_password(class="form-control-sm") }}</div>
+                  </div><br/>
+                  {% if form.confirm_password.errors %}
+                    <script type="text/javascript">
+                      $('document').ready(function() {
+                        $('#confirm_password').addClass('error-message');
+                      });
+                    </script>
+                    {% for e in form.confirm_password.errors %}
+                      <div class="row">
+                        <div class="col-sm-6"></div>
+                        <div class="col-sm-6"><p class="error-text">{{ e }}</p></div>
+                      </div>
+                    {% endfor %}
+                  {% endif %}
+                  <div class="row">
+                    <div class="col-sm-12">{{ form.submit(class="btn btn-primary") }}</div>
+                  </div>
+              </form>
             </div>
-        </form>
+          </div>
+          <div class="col-sm-3"></div>
+        </div>
       {% else %}
       <div class="row">
         <div class="col-sm-3"></div>
         <div class="col-sm-6 register">
           <div class="dialog">
+            {% include 'messages.html' %}
             <form method="POST" action="">
               {{ forgotform.hidden_tag() }} <!-- csrf token -->
               <div class="row">

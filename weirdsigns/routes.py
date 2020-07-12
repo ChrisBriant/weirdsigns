@@ -42,6 +42,9 @@ def process_signs(signs):
                     halfstar = False
                 else:
                     s['starclasses'].append('fa fa-star-o')
+        if s.get('comments'):
+            for c in s['comments']:
+                c['date_posted'] = c['date_posted'].strftime("%d/%m/%Y, %H:%M:%S")
     return signs
 
 
@@ -277,7 +280,18 @@ def addsign():
 
 @app.route('/gosign/<string:object_id>', methods=['GET', 'POST'])
 def gosign(object_id):
-    #sign = db.signs.find_one({'_id':ObjectId(object_id)})
+    form = CommentForm()
+    if form.validate_on_submit():
+        print("Here")
+        db.signs.update_one(   { "_id": ObjectId(object_id) },
+                              { "$push": { "comments": { "comment": form.comment.data.strip(),
+                                                         "username" : current_user.get_username(),
+                                                         "user_id" : current_user.get_id(),
+                                                         "date_posted" : datetime.datetime.now()
+                                                        }}}
+        )
+    else:
+        print(form.errors)
     sign=db.signs.aggregate(
             [ { '$match' : {'_id': ObjectId(object_id) } },
             { '$addFields' : {
@@ -295,9 +309,8 @@ def gosign(object_id):
                 }
             }]
         )
-    print(sign)
     sign = process_signs(list(sign))[0]
-    return render_template('gosign.html', sign=sign)
+    return render_template('gosign.html', sign=sign, form=form)
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
@@ -312,6 +325,7 @@ def register():
         #Check username and password unique in database
         if db.users.find_one({"$or":[{"username":{'$regex': form.username.data, '$options': '-i'}},{"email":{'$regex': form.email.data, '$options': '-i'}}]}):
             error_message = "An account with this username or password already exists"
+            flash(u"An account with this username or password already exists","danger")
         else:
             #proceed
             hashed_password = bcrypt.generate_password_hash(form.password.data).decode("utf-8")
@@ -323,9 +337,12 @@ def register():
             sendconfirmation(form.email.data, hash, form.username.data)
             success_message = "Account created for " + form.username.data +"!\n" + \
                 "Please check your email and click on the link to verify your email address"
+            flash(u"Account created for " + form.username.data +"!\n" + \
+                "Please check your email and click on the link to verify your email address",'success')
     elif form.errors:
         print(form.errors)
         error_message = "You have errors on the form"
+        flash(u"You have errors on the form","danger")
         """
         flash(errorstring,"danger")
         errorvals = [x[0] for x in list(form.errors.values())]
@@ -370,49 +387,62 @@ def forgot(confirm_hash=None):
         confirmed = False #For determining if sending email or changing the password
         if forgotform.validate_on_submit():
             forgothash = secrets.token_hex(20)
-            db.user.update_one(   { "email": forgotform.email.data },
+            db.users.update_one(   { "email": forgotform.email.data },
                                   { "$set": { "forgothash": forgothash, "dateforgot" : datetime.datetime.now() } }
             )
             sendforgot(forgotform.email.data, forgothash)
-            flash(f"An email with a password reset link has been sent to this email address if it is registered on the system.","warning")
+            flash(u"An email with a password reset link has been sent to this email address if it is registered on the system","success")
         elif forgotform.errors:
-            errorstring = "You have the following errors on the form:"
+            errorstring = u"You have errors on the form"
             flash(errorstring,"danger")
+            """
             errorvals = [x[0] for x in list(forgotform.errors.values())]
             errorlist = list(map(lambda x, y: x+ ': ' +y, list(form.errors.keys()), errorvals  ))
             for error in errorlist:
-                flash(error,"danger")
+                #flash(error,"danger")
                 errorstring = errorstring + error
+                """
     else:
         confirmed = True
         if form.validate_on_submit():
-            user = db.user.find_one({"forgothash":confirm_hash})
+            user = db.users.find_one({"forgothash":confirm_hash})
+            print(confirm_hash)
+            print(user)
             if user:
                 if user["dateforgot"] + datetime.timedelta(hours=1) > datetime.datetime.now():
                     #Get password hash and update
                     hashed_password = bcrypt.generate_password_hash(form.password.data).decode("utf-8")
-                    db.user.update_one(   { "_id": user["_id"] },
+                    db.users.update_one(   { "_id": user["_id"] },
                                           { "$set": { "password": hashed_password} }
                     )
-                    db.user.update_one(   { "_id": user["_id"] },
+                    db.users.update_one(   { "_id": user["_id"] },
                                           { "$unset": { "forgothash": "","dateforgot": ""} }
                     )
-                    flash("Password Rest, please login below","success")
-                    return redirect(url_for("login"))
+                    flash(u"Password Rest, please login below","success")
+                    print("Reset")
+                    return redirect(url_for("home"))
                 else:
-                    db.user.update_one(   { "_id": user["_id"] },
+                    db.users.update_one(   { "_id": user["_id"] },
                                           { "$unset": { "forgothash": "","dateforgot": ""} }
                     )
-                    flash("Sorry your password reset has expired, please try again","danger")
+                    flash(u"Sorry your password reset has expired, please try again","danger")
                     return redirect(url_for("forgot"))
-        elif forgotform.errors:
-            errorstring = "You have the following errors on the form:"
+            else:
+                flash(u"Sorry user account not found","danger")
+                redirect(url_for("forgot"))
+        else:
+            print("do wasedsdsd")
+            print(form.errors)
+            errorstring = u"Check that the passwords match and meet the complexity requirements"
             flash(errorstring,"danger")
+            print(errorstring)
+            """
             errorvals = [x[0] for x in list(forgotform.errors.values())]
             errorlist = list(map(lambda x, y: x+ ': ' +y, list(form.errors.keys()), errorvals  ))
             for error in errorlist:
                 flash(error,"danger")
                 errorstring = errorstring + error
+                """
     return render_template("forgot.html", forgotform=forgotform, form=form, forgot=forgot, confirmed=confirmed)
 
 @app.route("/changepassword", methods=["GET","POST"])
@@ -421,18 +451,19 @@ def change():
     myid = ObjectId(current_user.get_id())
     form = ChangeForm()
     if form.validate_on_submit():
-        user = db.user.find_one({"_id":myid})
+        user = db.users.find_one({"_id":myid})
         if user and bcrypt.check_password_hash(user["password"],form.oldpassword.data):
             hashed_password = bcrypt.generate_password_hash(form.password.data).decode("utf-8")
-            db.user.update_one(   { "_id": user["_id"] },
+            db.users.update_one(   { "_id": user["_id"] },
                                   { "$set": { "password": hashed_password} }
             )
-            flash("Password Rest, please login below","success")
+            flash(u"Your password has successfully been changed","success")
             #return redirect(url_for("home"))
         else:
-            flash("Password change unsuccessfull, please check your old password and try again","danger")
+            flash(u"Password change unsuccessfull, please check your old password and try again","danger")
     elif form.errors:
-        flash("Password change unsuccessfull, please try again","danger")
+        print(form.errors)
+        flash(u"Password change unsuccessfull, please try again","danger")
     return render_template("change.html", form=form)
 
 
@@ -448,10 +479,10 @@ def login():
             login_user(user, remember=form.remember.data)
             return redirect(url_for("home"))
         else:
-            flash("Login unsuccessful!","danger")
+            flash(u"Login unsuccessful!","danger")
     else:
         errors = [form.errors[k] for k in form.errors.keys()]
-        flash(errors,"danger")
+        #flash(errors,"danger")
     return render_template("login.html", title="Login", form=form)
 
 @app.route("/logout")

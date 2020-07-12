@@ -8,6 +8,7 @@
         <div class="col-sm-3"></div>
         <div class="col-sm-6 register">
           <div class="dialog">
+            {% include 'messages.html' %}
             <form method="POST" action="">
               {{ form.hidden_tag() }} <!-- csrf token -->
               <div class="row">
@@ -22,6 +23,19 @@
                 <div class="col-sm-6">{{ form.confirm_password.label(class="form-control-label") }}</div>
                 <div class="col-sm-6">{{ form.confirm_password(class="form-control-sm") }}</div>
               </div><br/>
+              {% if form.confirm_password.errors %}
+                <script type="text/javascript">
+                  $('document').ready(function() {
+                    $('#confirm_password').addClass('error-message');
+                  });
+                </script>
+                {% for e in form.confirm_password.errors %}
+                  <div class="row">
+                    <div class="col-sm-6"></div>
+                    <div class="col-sm-6"><p class="error-text">{{ e }}</p></div>
+                  </div>
+                {% endfor %}
+              {% endif %}
               <div class="row">
                 <div class="col-sm-6">{{ form.submit(class="btn btn-primary") }}</div>
               </div>

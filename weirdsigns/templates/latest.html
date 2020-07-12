@@ -147,7 +147,8 @@
                     <div class="col">
                       {% if current_user.is_authenticated %}
                         {% if sign.already_rated %}
-                          <div>Rated <i class="fa fa-check" aria-hidden="true"></i></div>
+                          <div>Rated</div>
+                          <div class="rating"><i class="fa fa-check" aria-hidden="true"></i></div>
                         {% else %}
                           <div>Rate:</div>
                           <div id="rating_{{  sign._id }}" class="rating" style="display:inline-block">

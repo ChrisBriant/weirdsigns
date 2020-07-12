@@ -1,11 +1,27 @@
 {% extends "layout.html" %}
 {% block content %}
+    <script type="text/javascript">
+      $('document').ready(function() {
+        $('#addcomment').click(function(e) {
+          e.preventDefault();
+
+          if( $('#comment-list').is(":hidden")) {
+            $('#comment-list').show();
+            $('#comment-form').hide();
+            $(this).text('Add Comment');
+          } else {
+            $('#comment-list').hide();
+            $('#comment-form').show();
+            $(this).text('Cancel');
+          }
+        });
+      });
+    </script>
     <section class="section-onesign">
       <div class="row">
         <div class="col-12 page-head"><h1>{{ sign.title }}</h1></div>
       </div>
       <div class="row">
-        <div class="col-2"></div>
         <div class="col-8 single-card">
           <div class="card">
             <div class="card-header">
@@ -87,7 +103,8 @@
                 <div class="col">
                   {% if current_user.is_authenticated %}
                     {% if sign.already_rated %}
-                      <div>Rated <i class="fa fa-check" aria-hidden="true"></i></div>
+                      <div>Rated</div>
+                      <div class="rating"><i class="fa fa-check" aria-hidden="true"></i></div>
                     {% else %}
                       <div>Rate:</div>
                       <div id="rating_{{  sign._id }}" class="rating" style="display:inline-block">
@@ -116,7 +133,71 @@
             </div>
           </div>
         </div>
-        <div class="col-2"></div>
+        <div class="col-4 register">
+          <div class="row">
+            <div class="col">
+              <h2>Comments</h2>
+            </div>
+          </div>
+          <div id="comment-form" class="row comment-area">
+            <div class="col">
+              <div class="form-group">
+                <form method="POST" enctype="multipart/form-data">
+                {{ form.hidden_tag() }} <!-- csrf token -->
+                <div class="row">
+                  <div class="col">{{ form.comment.label(class="form-control-label col-2") }}</div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                      {% if form.comment.errors %}
+                        {{ form.comment(class="form-control-md col-8") }}
+                        <div class="invalid-feedback">
+                          {% for error in form.comment.errors %}
+                            <p>{{ form.comment.errors }}</p>
+                            <span>{{ error }}</span>
+                          {% endfor %}
+                        </div>
+                      {% else %}
+                        {{ form.comment(cols="35",rows="5",class="form-control-md comment-text-area") }}
+                      {% endif %}
+                    </div>
+                  </div><br/>
+                  <div class="row">
+                    <div class="col-sm-12">{{ form.submit(class="btn btn-primary") }}</div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div><br/>
+          <div id="comment-list" class="row overflow-auto">
+            <div class="col">
+              <div class="comment-area">
+              {% if sign.comments %}
+                {% for comment in sign.comments %}
+                  <div class="comment-item">
+                    <div class="row">
+                      <div class="col">
+                        <p class="form-text-muted">By {{ comment.username }} on {{ comment.date_posted }}</p>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col">
+                        <p class="comment-text">{{ comment.comment }}</p>
+                      </div>
+                    </div>
+                  </div><br/>
+                {% endfor %}
+              {% endif %}
+              </div>
+            </div>
+        </div><br/>
+          <div class="row">
+            <div class="col add-comment">
+              <a id="addcomment" href="#">Add Comment</a>
+            </div>
+          </div>
+          </div>
+        </div>
 
       </div>
     </section>
