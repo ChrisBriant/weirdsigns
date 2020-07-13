@@ -6,8 +6,16 @@ from weirdsigns.models import User
 from weirdsigns.email import sendconfirmation, sendforgot
 from bson import ObjectId, Decimal128
 from flask_login import login_user, current_user, logout_user, login_required
-import os, secrets, datetime, uuid
+import os, secrets, datetime, uuid, PIL
 from bson.json_util import dumps
+from PIL import Image
+
+
+#Resize image
+def resize_picture(size, file, path):
+    img = PIL.Image.open(file)
+    img = img.resize(size, PIL.Image.ANTIALIAS)
+    img.save(path)
 
 
 #Process the sign data
@@ -73,7 +81,7 @@ def home():
             login_user(user, remember=form.remember.data)
             return redirect(url_for("latest"))
         else:
-            flash(f"Login unsuccessful!","danger")
+            flash(u"Login unsuccessful!","danger")
             message = "Login unsuccessful!"
     else:
         #errors = [form.errors[k] for k in form.errors.keys()]
@@ -246,19 +254,33 @@ def signs_within():
     return dumps(list(signs)), 200, {'ContentType':'application/json'}
 
 
+@app.errorhandler(413)
+def largefile_error(e):
+    print("Large file")
+    return redirect(url_for("addsign")), 413
+
+
 @app.route('/addsign', methods=['GET', 'POST'])
 def addsign():
     if not current_user.is_authenticated:
         flash(f"Please login to upload a sign","danger")
-        return redirect(url_for('login'))
+        return redirect(url_for('home'))
+    #try:
     form = FileUploadForm();
+    """
+    except Exception as e:
+        print(e)
+        flash(u"File size too large: please choose a file under 4mb","danger")
+        return redirect(url_for("home"))
+        """
     if form.validate_on_submit():
         f = form.photo.data
         filename = secure_filename(f.filename)
         ext = filename.split('.')[1]
         newfilename = uuid.uuid4().hex + '.' + ext
         filepath = os.path.join(app.instance_path, 'media/img', newfilename)
-        f.save(filepath)
+        #f.save(filepath)
+        resize_picture((260, 180),form.photo.data,filepath)
         print(app.instance_path)
         user_dict = db.users.find_one({"_id":ObjectId(current_user.get_id()) })
         del user_dict["password"]
@@ -274,7 +296,7 @@ def addsign():
 
         }
         sign_id= db.signs.insert_one(sign_dict)
-        return redirect(url_for('home'))
+        return redirect(url_for('latest'))
     return render_template('addsign.html', form=form)
 
 

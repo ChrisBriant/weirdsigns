@@ -10,7 +10,7 @@ import re
 class FileUploadForm(FlaskForm):
     title = StringField("Caption", validators=[DataRequired()])
     wherefound = StringField("Where did you see this?", validators=[DataRequired()])
-    photo = FileField(validators=[FileRequired(),FileAllowed(['jpg','jpeg','png'], 'Images only!')])
+    photo = FileField("Choose Picture",validators=[FileRequired(),FileAllowed(['jpg','jpeg','png'], 'Images only!')])
     long = DecimalField()
     lat = DecimalField()
     submit = SubmitField("Submit")
@@ -52,6 +52,11 @@ class ChangeForm(FlaskForm):
     password = PasswordField("New Password", validators=[DataRequired()])
     confirm_password = PasswordField("Confirm Password", validators=[DataRequired(),EqualTo("password")])
     submit = SubmitField("Change")
+
+    def validate_confirm_password(form, field):
+        if not re.match(r'[A-Za-z0-9@#$%!^&+=]{8,}', field.data):
+            raise ValidationError('Password must have a compination of upper case, lowercase, numeric, a special character and must be over 8 characters long')
+
 
 class SignSubmitByIdForm(FlaskForm):
     signids = StringField("idlist", validators=[DataRequired()])

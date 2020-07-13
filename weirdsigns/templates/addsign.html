@@ -1,5 +1,21 @@
 {% extends "layout.html" %}
 {% block content %}
+    <script type="text/javascript">
+      $('document').ready(function() {
+        //binds to onchange event of your input field
+        $('#photo').on('change', function() {
+          if(this.files[0].size > 4194304) {
+            $(this).val('');
+            $('#photo-error').text('File size too large, please select a file under 4mb');
+            $('#photo-error').show();
+            $('#show-file-name').text('');
+          } else {
+            $('#photo-error').hide();
+            $('#show-file-name').text(this.files[0].name);
+          }
+        });
+      });
+    </script>
     <section>
       <div class="row">
         <div class="col-12 page-head"><h1>Add Sign</h1></div>
@@ -11,10 +27,11 @@
             <form method="POST" enctype="multipart/form-data">
               {{ form.hidden_tag() }} <!-- csrf token -->
               <fieldset class="form-group">
-                <legend class="border-bottom mb-4">Upload</legend>
-                <div id="map" class="map"></div>
+                <legend class="mb-4">Upload</legend>
+                {% include 'messages.html' %}
+                <div id="map" class="map"></div><br/>
                 {% if form.lat.errors or form.long.errors %}
-                  <p>You must select an area on the map</p>
+                  <p class="error-text" style="text-align:center;">You must select an area on the map</p>
                 {% endif %}
                 <script type="text/javascript">
                   var map = new ol.Map({
@@ -73,51 +90,53 @@
 
                 </script>
                 <div class="form-group">
-                  {{ form.wherefound.label(class="form-control-label col-2") }}
+                  {{ form.wherefound.label(class="form-control-label col-4") }}
                   {% if form.wherefound.errors %}
-                    {{ form.wherefound(class="form-control-md col-8") }}
+                    {{ form.wherefound(class="form-control-md col-6") }}
                     <div class="invalid-feedback">
                       {% for error in form.wherefound.errors %}
-                        <p>{{ form.wherefound.errors }}</p>
+                        <p class="error-text">{{ form.wherefound.errors }}</p>
                         <span>{{ error }}</span>
                       {% endfor %}
                     </div>
                   {% else %}
-                    {{ form.wherefound(class="form-control-md col-8") }}
+                    {{ form.wherefound(class="form-control-md col-6") }}
                   {% endif %}
                 </div>
                 <div class="form-group">
-                  {{ form.title.label(class="form-control-label col-2") }}
+                  {{ form.title.label(class="form-control-label col-4") }}
                   {% if form.title.errors %}
-                    {{ form.title(class="form-control-md col-8") }}
+                    {{ form.title(class="form-control-md col-6") }}
                     <div class="invalid-feedback">
                       {% for error in form.title.errors %}
-                        <p>{{ form.title.errors }}</p>
+                        <p class="error-text">{{ form.title.errors }}</p>
                         <span>{{ error }}</span>
                       {% endfor %}
                     </div>
                   {% else %}
-                    {{ form.title(class="form-control-md col-8") }}
+                    {{ form.title(class="form-control-md col-6") }}
                   {% endif %}
                 </div>
                 <div class="form-group">
-                  {{ form.photo.label(class="form-control-label col-2") }}
+                  <label class="col-4"></label>
+                  {{ form.photo.label(class="form-control-label btn btn-primary col-4") }}
+                  <label id="show-file-name" class="col-2"></label>
                   {% if form.photo.errors %}
-                    {{ form.photo(class="form-control-md col-8") }}
+                    {{ form.photo(class="form-control-md col-6",style="display:none;") }}
                     <div class="invalid-feedback">
                       {% for error in form.photo.errors %}
-                        <p>{{ form.photo.errors }}</p>
+                        <p class="error-text">{{ form.photo.errors }}</p>
                         <span>{{ error }}</span>
                       {% endfor %}
                     </div>
                   {% else %}
-                    {{ form.photo(class="form-control-md col-8") }}
+                    {{ form.photo(class="form-control-md col-6",style="display:none;") }}
+                    <p id="photo-error" class="error-text col-6 offset-4" style="display:none;"></p>
                   {% endif %}
                 </div>
                 <div class="form-group">
-                  {{ form.long.label(class="form-control-label col-2") }}
                   {% if form.long.errors %}
-                    {{ form.long(class="form-control-md col-8") }}
+                    {{ form.long(class="form-control-md col-8",style="display:none;") }}
                     <div class="invalid-feedback">
                       {% for error in form.long.errors %}
                         <p>{{ form.long.errors }}</p>
@@ -125,13 +144,12 @@
                       {% endfor %}
                     </div>
                   {% else %}
-                    {{ form.long(class="form-control-md col-8") }}
+                    {{ form.long(class="form-control-md col-8",style="display:none;") }}
                   {% endif %}
                 </div>
                 <div class="form-group">
-                  {{ form.lat.label(class="form-control-label col-2") }}
                   {% if form.lat.errors %}
-                    {{ form.lat(class="form-control-md col-8") }}
+                    {{ form.lat(class="form-control-md col-8",style="display:none;") }}
                     <div class="invalid-feedback">
                       {% for error in form.lat.errors %}
                         <p>{{ form.lat.errors }}</p>
@@ -139,7 +157,7 @@
                       {% endfor %}
                     </div>
                   {% else %}
-                    {{ form.lat(class="form-control-md col-8") }}
+                    {{ form.lat(class="form-control-md col-8",style="display:none;") }}
                   {% endif %}
                 </div>
                 <div class="form-group">

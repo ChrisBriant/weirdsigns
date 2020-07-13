@@ -11,13 +11,7 @@ app = Flask(__name__, static_folder="static")
 
 app.config["SECRET_KEY"] = "$2a$04$5NwD/PAOChKgbgZkGnE0h.wNzQ3d33UIoNQnAY17fxqbuvy2/l1Ga"
 app.config['UPLOAD_FOLDER'] = os.path.join(app.instance_path, 'media/img/')
-
-"""
-@app.context_processor
-def set_pagetitle(title="latest"):
-    print(title)
-    return dict(pagetitle=title)
-    """
+app.config['MAX_CONTENT_LENGTH'] = 4 * 1024 * 1024  # 4MB max-limit.
 
 client = pymongo.MongoClient("mongodb+srv://Biceptio:WilliamTheWeak1ng!@cluster0-d1os1.mongodb.net/<dbname>?retryWrites=true&w=majority")
 db = client.weirdsigns
