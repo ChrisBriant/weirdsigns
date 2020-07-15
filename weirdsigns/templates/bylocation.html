@@ -82,7 +82,9 @@
       <div class="row">
         <div class="col-1"></div>
         <div class="col-10 maparea">
-          <p>Select a Location on the Map to View Signs</p>
+          <div class="row">
+            <div class="col map-head"><p>Select a Location on the Map to View Signs</p></div>
+          </div>
           <div class="row">
             <div class="col mapcontainer">
               <div id="mainmap" class="map" >
@@ -132,8 +134,7 @@
                 controls: ol.control.defaults({
                   attributionOptions: {
                     className: 'my-ol-attribution'
-                  },
-                  zoom:false
+                  }
                 })
               });
 
@@ -241,7 +242,9 @@
                       var coordinate = event.coordinate;
 
                       content.innerHTML = '<b>'+ item.title +'</b><br/>' +
-                      '<img src="/pictures/'+ item.file + '" alt="sign.title"/>';
+                      '<img src="/pictures/'+ item.file + '" alt="sign.title"/><br/>' +
+                      '<a href="/gosign/'+ item._id.$oid +'">view</a>';
+                      console.log(item._id);
                       overlay.setPosition(coordinate);
                   } else {
                       overlay.setPosition(undefined);

@@ -248,7 +248,7 @@ def signs_within():
             ]
          }
       }
-    })
+    }).limit(10)
     #print(dumps(list(signs)))
     #return jsonify(success=True)
     return dumps(list(signs)), 200, {'ContentType':'application/json'}
@@ -302,13 +302,19 @@ def addsign():
 
 @app.route('/gosign/<string:object_id>', methods=['GET', 'POST'])
 def gosign(object_id):
+    if current_user.is_authenticated:
+        username = current_user.get_username()
+        userid = current_user.get_id()
+    else:
+        username = "Anonymous"
+        userid = None
     form = CommentForm()
     if form.validate_on_submit():
         print("Here")
         db.signs.update_one(   { "_id": ObjectId(object_id) },
                               { "$push": { "comments": { "comment": form.comment.data.strip(),
-                                                         "username" : current_user.get_username(),
-                                                         "user_id" : current_user.get_id(),
+                                                         "username" : username,
+                                                         "user_id" : userid,
                                                          "date_posted" : datetime.datetime.now()
                                                         }}}
         )

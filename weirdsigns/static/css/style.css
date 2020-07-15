@@ -270,6 +270,8 @@ header .hero-login-col a:visited {
 .herotitle {
   font-size: 600%;
   font-weight: 200;
+  font-family: 'Lato','Arial',sans-serif;
+  color: #fff;
   text-align: center;
 }
 
@@ -349,6 +351,7 @@ input[type=checkbox] {
 
 .login, .dialog {
   border: 1px solid #2e2e2e;
+  border-radius: 15px;
   padding: 10px;
 }
 
@@ -638,17 +641,33 @@ a:active {
   width:80vw;
 }
 
+
+.map-head {
+  margin-top: 0;
+  padding-top: 0;
+  text-align: center;
+  /*padding-left: 26px;*/
+}
+
+.map-head p {
+  width: 80vw;
+  background-color: #01104a;
+  color: #fff;
+  margin: 0;
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+}
+
 .show-button-row {
   margin-top: 0;
   padding-top: 0;
   /*padding-left: 26px;*/
 }
 
-/*
 .show-btn {
-  margin-left: 26px;
-  margin-right: 26px;
-}*/
+  border-bottom-left-radius: 15px;
+  border-bottom-right-radius: 15px;
+}
 
 .show-button-row div {
   padding-top: 0;
@@ -724,7 +743,7 @@ a:active {
 }
 
 .comment-area {
-  height: 65%;
+  height: 47vh;
 }
 
 .add-comment:before {
