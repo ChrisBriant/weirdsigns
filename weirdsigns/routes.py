@@ -64,10 +64,11 @@ def uploaded_file(filename):
 
 @app.route('/pictures/mostrecent')
 def most_recent_file():
-    filename = db.signs.find().sort([( '$natural', 1 )] ).limit(1)
-    print(filename)
-    return send_from_directory(app.config['UPLOAD_FOLDER'],
-                               'deadrat.jpeg')
+    filename = db.signs.find().sort([( '$natural', -1 )] ).limit(1)
+    print(filename[0]['file'])
+    print()
+    #return '/pictures/'+filename[0]['file']
+    return send_from_directory(app.config['UPLOAD_FOLDER'],filename[0]['file'])
 
 @app.route("/", methods=['GET', 'POST'])
 @app.route("/home", methods=['GET', 'POST'])
@@ -84,12 +85,7 @@ def home():
             flash(u"Login unsuccessful!","danger")
             message = "Login unsuccessful!"
     else:
-        #errors = [form.errors[k] for k in form.errors.keys()]
-        #flash(errors,"danger")
         print(form.errors)
-        #message=errors
-    #signs = db.signs.find().sort([( '$natural', 1 )] ).limit(10)
-    #signs = None
     return render_template("home.html",form=form,home=True,message=message)
 
 
