@@ -11,7 +11,6 @@
 
 html,
 body {
-  /*background-color: #cfcfcf;*/
   background-color: #adadad;
   color:#262626;
   font-family: 'Lato','Arial',sans-serif;
@@ -146,11 +145,6 @@ header {
 
 }
 
-/*
-.nav-selected {
-  border-top: 2px solid #fff;
-  border-bottom: 2px solid #fff;
-}*/
 
 .nav-selected:before {
     content: ""; /* This is necessary for the pseudo element to work. */
@@ -168,11 +162,6 @@ header {
     border-bottom: 2px solid #fff; /* This creates the border. Replace black with whatever color you want. */
 }
 
-/*
-.nav-unselected {
-  margin-bottom: 2px;
-  margin-top: 2px;
-}*/
 
 .nav-unselected:before {
     content: ""; /* This is necessary for the pseudo element to work. */
@@ -287,9 +276,6 @@ header .hero-login-col a:visited {
   font-size: 160%;
   font-weight: 300;
 }
-
-
-
 
 /*----------------------------------------------*/
 /*PARAGRAPHS*/
@@ -410,25 +396,6 @@ a {
 }
 
 
-/*
-a:link,
-a:visited {
-  color: #e67e22;
-  text-decoration: none;
-  padding-bottom: 1px;
-  border-bottom: 1px solid #e67e22;
-  -webkit-transition: border-bottom 0.2s, color 0.2s;
-  transition: border-bottom 0.2s, color 0.2s;
-}
-
-a:hover,
-a:active {
-  color: #262626;
-  border: 1px solid transparent;
-}
-*/
-
-
 /********************************/
 /* STARS */
 /********************************/
@@ -467,47 +434,6 @@ a:active {
   color: #00b818;
 }
 
-
-
-/*
-.rating-starfilled:after {
-    position: relative;
-    font-family: FontAwesome;
-    content:'\f005';
-}
-
-.rating-starempty {
-    padding: 0 5px;
-    margin: 0;
-    cursor: pointer;
-    display: block;
-    float: right;
-    color: #FFCA00;
-}
-
-.rating-starempty:after {
-    position: relative;
-    font-family: FontAwesome;
-    content:'\f006';
-}
-
-.rating-halfstar {
-    padding: 0 5px;
-    margin: 0;
-    cursor: pointer;
-    display: block;
-    float: right;
-    color: #FFCA00;
-}
-
-.rating-halfstar:after {
-    position: relative;
-    font-family: FontAwesome;
-    content:'\f123';
-}
-*/
-
-
 /*----------------------------------------------*/
 /*CARDS LATEST and POPULAR */
 /*----------------------------------------------*/
@@ -523,14 +449,7 @@ a:active {
 .card-img-top {
   width: 100%;
   padding: 5%;
-  /*padding-right: 5%;*/
 }
-
-/*
-.card-header {
-  background-color: #01104a;
-  color: #fff;
-}*/
 
 .sign-header-left,
 .sign-header-right {
@@ -577,9 +496,6 @@ a:active {
 }
 
 .card .map {
-  /*height: 300px;
-  width: 400px;*/
-  /*width:  30vw;*/
   height: 100vh;
 }
 
@@ -622,13 +538,9 @@ a:active {
 /*----------------------------------------------*/
 
 #mainmap {
-  /*
-  width: 800px;
-  height: 500px;*/
   width:  80vw;
   height: 70vh;
   text-align: center;
-  /*padding-left: 26px;*/
 }
 
 .mapcontainer {
@@ -648,7 +560,6 @@ a:active {
   margin-top: 0;
   padding-top: 0;
   text-align: center;
-  /*padding-left: 26px;*/
 }
 
 .map-head p {
@@ -725,11 +636,6 @@ a:active {
   height: 60vh;
 }
 
-/*
-.card-map-single {
-  max-height: 400px;
-}*/
-
 .single-image {
   height: 60vh;
 }
@@ -782,12 +688,6 @@ a:active {
 .comment-text {
   color: #4361cc;
 }
-
-/*
-.comment-area .col {
-  overflow-y: auto;
-}*/
-
 
 /*----------------------------------------------*/
 /*BUTTONS*/

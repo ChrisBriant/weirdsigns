@@ -9,18 +9,6 @@
 
         $('document').ready(function() {
 
-          $(window).resize(function () {
-             /*
-                var canvasheight=$('.map').parent().css('height');
-                var canvaswidth=$('.map').parent().css('width');
-
-                alert(canvaswidth);
-
-                $('.map').css("height", canvasheight);
-                $('.map').css("width", canvaswidth);
-              */
-          });
-
           $(".star").on('click', function() {
             ratingsChanged = true;
 
@@ -50,7 +38,6 @@
             var signId = $(this).attr('id').toString();
             var rating = $('#rating_'+ signId +' .fa-star').length.toString();
             var dataToSubmit = JSON.stringify({ signId:signId,rating:rating });
-            //var rating = $(this).parent().parent().firstChild().find('fa-star');
             $.ajax({
               type: "POST",
               dataType: "application/json",
@@ -61,18 +48,6 @@
               }
             });
           });
-
-          /*
-          $('#showsigns').click(function(e) {
-            e.preventDefault();
-            alert("Here");
-            console.log(locationData);
-            locationData = locationData.map((loc) => loc._id.$oid);
-            console.log(locationData);
-            var cardareahtml = "";
-          });
-          */
-
         });
       </script>
       <div class="row">
@@ -180,7 +155,6 @@
                 markerLayers = layers.filter(l => l.values_.type == "marker");
                 markerLayers.forEach((layer) => mainmap.removeLayer(layer));
                 $('#signids').val('');
-                //$('#submit').addClass('hide-on-render');
                 if(locationData.length == 0) {
                   $('#submit').attr('disabled',true);
                 }
@@ -190,8 +164,6 @@
                 if(newZoom > 10) {
                   var extent = mainmap.getView().calculateExtent(mainmap.getSize());
                   extent = ol.proj.transformExtent(extent, 'EPSG:3857', 'EPSG:4326');
-                  //var bottomLeft = ol.toLonLat(ol.extent.getBottomLeft(extent));
-                  //var topRight = ol.toLonLat(ol.extent.getTopRight(extent));
                   dataToSubmit = JSON.stringify({extent:extent});
                   $.ajax({
                     type: "POST",
@@ -204,7 +176,6 @@
                         addMarker(data[i].location.coordinates[0].$numberDecimal,data[i].location.coordinates[1].$numberDecimal,data[i]);
                         locationData = locationData.map((loc) => loc._id.$oid);
                         $('#signids').val(locationData);
-                        //$('#submit').removeClass('hide-on-render');
                         $('#submit').attr('disabled',false);
                       }
                     },
@@ -251,9 +222,6 @@
                       closer.blur();
                   }
               });
-              //https://openstreetmap.be/en/projects/howto/openlayers.html
-              //Need way to get the feature
-
             </script>
         </div>
         <div class="col-1"></div>

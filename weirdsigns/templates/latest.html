@@ -8,7 +8,6 @@
 
         $('document').ready(function() {
           $(window).resize(function () {
-             //$('#log').append('<div>Handler for .resize() called.</div>');
                 var canvasheight=$('.map').parent().css('height');
                 var canvaswidth=$('.map').parent().css('width');
 
@@ -43,7 +42,6 @@
             var signId = $(this).attr('id').toString();
             var rating = $('#rating_'+ signId +' .fa-star').length.toString();
             var dataToSubmit = JSON.stringify({ signId:signId,rating:rating });
-            //var rating = $(this).parent().parent().firstChild().find('fa-star');
             $.ajax({
               type: "POST",
               dataType: "application/json",

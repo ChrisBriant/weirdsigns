@@ -88,7 +88,6 @@ def home():
 
 @app.route("/latest", methods=['GET', 'POST'])
 def latest():
-    #signs = db.signs.find().sort([( '$natural', -1 )] ).limit(10)
     signs = db.signs.aggregate([
         { '$addFields' : {
                 'title' : '$title',
@@ -110,49 +109,11 @@ def latest():
         },
         { '$limit' : 10 }
     ])
-    #signs=list(signs)
     signs = process_signs(list(signs))
     return render_template("latest.html",home=True, signs=signs,title="latest")
 
 @app.route("/popular", methods=['GET', 'POST'])
 def popular():
-    """
-    signs = db.signs.aggregate([
-       { '$match': { status: "A" } },
-       { $group: { _id: "$cust_id", total: { $sum: "$amount" } } }
-    ])
-    """
-
-    """
-    signs = db.signs.aggregate(([
-    { '$unwind': '$ratings' },
-    {
-        '$group': {
-          '_id': '_id',
-          'TotalRating': { '$sum': "ratings.rating" }
-        }
-      }
-    ]))
-    """
-
-    """
-    signs = db.signs.aggregate([
-        {
-            '$project' : {
-                'title' : '$title',
-                'creator': '$creator',
-                'created': '$created',
-                'wherefound' : '$wherefound',
-                'ratings' : '$ratings',
-                'long' : '$long',
-                'lat' : '$lat',
-                'file' : '$file',
-                'AverageRating' : { '$avg': "$ratings.rating" }
-            }
-        }
-    ])
-    """
-
     signs = db.signs.aggregate([
         { '$addFields' : {
                 'title' : '$title',
@@ -184,11 +145,7 @@ def bylocation():
     form = SignSubmitByIdForm()
     signs = None
     if form.validate_on_submit():
-        #objectids = [{'_id':ObjectId(id)} for id in form.signids.data.split(',')]
         objectids = [ObjectId(id) for id in form.signids.data.split(',')]
-        #print('here',objectids)
-        #signs = db.signs.find(objectids)
-        #signs=db.signs.find({ "_id": {'$in': objectids} })
         signs=db.signs.aggregate(
                 [ { '$match' : {'_id': {'$in': objectids} } },
                 { '$addFields' : {
@@ -242,8 +199,6 @@ def signs_within():
          }
       }
     }).limit(10)
-    #print(dumps(list(signs)))
-    #return jsonify(success=True)
     return dumps(list(signs)), 200, {'ContentType':'application/json'}
 
 
@@ -258,14 +213,7 @@ def addsign():
     if not current_user.is_authenticated:
         flash(f"Please login to upload a sign","danger")
         return redirect(url_for('home'))
-    #try:
-    form = FileUploadForm();
-    """
-    except Exception as e:
-        print(e)
-        flash(u"File size too large: please choose a file under 4mb","danger")
-        return redirect(url_for("home"))
-        """
+    form = FileUploadForm()
     if form.validate_on_submit():
         f = form.photo.data
         filename = secure_filename(f.filename)
@@ -342,8 +290,6 @@ def register():
         return redirect(url_for("home"))
     form = RegistrationForm()
     if form.validate_on_submit():
-        #sendtestmessage('me@test.com',form.email.data)
-        #Check username and password unique in database
         if db.users.find_one({"$or":[{"username":{'$regex': form.username.data, '$options': '-i'}},{"email":{'$regex': form.email.data, '$options': '-i'}}]}):
             error_message = "An account with this username or password already exists"
             flash(u"An account with this username or password already exists","danger")
@@ -364,14 +310,6 @@ def register():
         print(form.errors)
         error_message = "You have errors on the form"
         flash(u"You have errors on the form","danger")
-        """
-        flash(errorstring,"danger")
-        errorvals = [x[0] for x in list(form.errors.values())]
-        errorlist = list(map(lambda x, y: x+ ': ' +y, list(form.errors.keys()), errorvals  ))
-        for error in errorlist:
-            flash(error,"danger")
-            errorstring = errorstring + error
-        """
     return render_template("register.html", title="Register", form=form, error_message=error_message,success_message=success_message)
 
 @app.route("/confirm/<string:confirm_hash>")
@@ -416,13 +354,6 @@ def forgot(confirm_hash=None):
         elif forgotform.errors:
             errorstring = u"You have errors on the form"
             flash(errorstring,"danger")
-            """
-            errorvals = [x[0] for x in list(forgotform.errors.values())]
-            errorlist = list(map(lambda x, y: x+ ': ' +y, list(form.errors.keys()), errorvals  ))
-            for error in errorlist:
-                #flash(error,"danger")
-                errorstring = errorstring + error
-                """
     else:
         confirmed = True
         if form.validate_on_submit():
@@ -457,13 +388,6 @@ def forgot(confirm_hash=None):
             errorstring = u"Check that the passwords match and meet the complexity requirements"
             flash(errorstring,"danger")
             print(errorstring)
-            """
-            errorvals = [x[0] for x in list(forgotform.errors.values())]
-            errorlist = list(map(lambda x, y: x+ ': ' +y, list(form.errors.keys()), errorvals  ))
-            for error in errorlist:
-                flash(error,"danger")
-                errorstring = errorstring + error
-                """
     return render_template("forgot.html", forgotform=forgotform, form=form, forgot=forgot, confirmed=confirmed)
 
 @app.route("/changepassword", methods=["GET","POST"])
@@ -479,7 +403,6 @@ def change():
                                   { "$set": { "password": hashed_password} }
             )
             flash(u"Your password has successfully been changed","success")
-            #return redirect(url_for("home"))
         else:
             flash(u"Password change unsuccessfull, please check your old password and try again","danger")
     elif form.errors:
@@ -503,7 +426,6 @@ def login():
             flash(u"Login unsuccessful!","danger")
     else:
         errors = [form.errors[k] for k in form.errors.keys()]
-        #flash(errors,"danger")
     return render_template("login.html", title="Login", form=form)
 
 @app.route("/logout")
