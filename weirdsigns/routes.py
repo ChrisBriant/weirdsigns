@@ -65,9 +65,6 @@ def uploaded_file(filename):
 @app.route('/pictures/mostrecent')
 def most_recent_file():
     filename = db.signs.find().sort([( '$natural', -1 )] ).limit(1)
-    print(filename[0]['file'])
-    print()
-    #return '/pictures/'+filename[0]['file']
     return send_from_directory(app.config['UPLOAD_FOLDER'],filename[0]['file'])
 
 @app.route("/", methods=['GET', 'POST'])
