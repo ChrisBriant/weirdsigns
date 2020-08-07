@@ -4,6 +4,9 @@
       <title>Title</title>
       <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
       <meta content="utf-8" http-equiv="encoding">
+      <meta name="viewport" content "width=device-width, initial-scale=1.0">
+      <meta name="description" content="An app where people can upload pictures of signs they have seen around the world which are funny in some way">
+      <meta name="keywords" content="humour,signs,funny,weird,interesting,strange,joke,notices,messages,message,pictures,world,ammusement,laugh">
       <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.1.0/cookieconsent.min.css" />
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.3.1/css/ol.css" type="text/css">
       <link href="https://fonts.googleapis.com/css2?family=Bubblegum+Sans&display=swap" rel="stylesheet">
@@ -33,6 +36,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;1,300&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/queries.css') }}">
 
 
   </head>
@@ -99,6 +103,9 @@
               <a class="nav-link" href="/logout">Logout</a>
             </li>
           {% endif %}
+          <li class="nav-item nav-unselected">
+            <a class="nav-link" href="/contact">Contact</a>
+          </li>
         </ul>
         </div>
       </nav>

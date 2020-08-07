@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+{% block content %}
+    <section class="section-report">
+      <div class="row">
+        <div class="col-sm-3"></div>
+        <div class="col-sm-6 register">
+          <div class="dialog">
+          <form method="POST" action="">
+            {{ form.hidden_tag() }} <!-- csrf token -->
+            <h1>Contact</h1>
+            {% include 'messages.html' %}
+            <fieldset class="form-group">
+              <legend class="mb-4">Please use the form below to send a message to the website admin, you can make requests about content or provide feedback</legend>
+              <div class="row">
+                <div class="col-sm-12">{{ form.message.label(class="form-control-label") }}</div>
+              </div>
+              <div class="row">
+                <div class="col-sm-12">{{ form.message(class="form-control-sm comment-box") }}</div>
+              </div><br/>
+            </fieldset>
+            <div class="row">
+                <div class="col-sm-12">{{ form.submit(class="btn btn-primary") }}</div>
+            </div><br/>
+          </form>
+          </div>
+        </div>
+        <div class="col-sm-3"></div>
+      </div>
+    </section>
+{% endblock %}

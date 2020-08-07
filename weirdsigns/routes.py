@@ -3,7 +3,7 @@ from wtforms.validators import ValidationError
 from weirdsigns import app,db, bcrypt
 from weirdsigns.forms import *
 from weirdsigns.models import User
-from weirdsigns.email import sendconfirmation, sendforgot
+from weirdsigns.email import sendconfirmation, sendforgot, send_to_admin
 from bson import ObjectId, Decimal128
 from flask_login import login_user, current_user, logout_user, login_required
 import os, secrets, datetime, uuid, PIL
@@ -26,7 +26,6 @@ def process_signs(signs):
             #convert to long and lat
             s['long'] = s['location']['coordinates'][0]
             s['lat'] = s['location']['coordinates'][1]
-            print(s['location']);
         if s.get("ratings") and current_user.is_authenticated:
             if ObjectId(current_user.id) in [rating['user_id'] for rating in s['ratings']]:
                 s["already_rated"] = True
@@ -41,7 +40,6 @@ def process_signs(signs):
             else:
                 halfstar = False
             avgwholepart = avgnearesthalf // 1
-            print(avgwholepart)
             for i in range(1,6):
                 if i <= avgwholepart:
                     s['starclasses'].append('fa fa-star')
@@ -164,7 +162,6 @@ def bylocation():
                 }]
             )
         signs=process_signs(list(signs))
-        print(signs)
         return render_template("latest.html", signs=signs, title="View By Location")
     else:
         print(form.errors)
@@ -180,13 +177,10 @@ def rate_sign():
             db.signs.update_one({"_id":ObjectId(data["signId"]),'ratings.user_id': {'$ne': ObjectId(current_user.id)}}, {"$addToSet": {"ratings":{"user_id":ObjectId(current_user.id),"rating":int(data["rating"]) } }}, upsert=True)
         except Exception as e:
             print(e)
-        print(data)
-        print(ObjectId(current_user.id))
     return jsonify(success=True)
 
 @app.route("/getsignswithin", methods=['POST'])
 def signs_within():
-    print('getsignswithin')
     data = request.get_json(force=True)
 
     signs = db.signs.find({
@@ -204,7 +198,6 @@ def signs_within():
 
 @app.errorhandler(413)
 def largefile_error(e):
-    print("Large file")
     return redirect(url_for("addsign")), 413
 
 
@@ -222,7 +215,6 @@ def addsign():
         filepath = os.path.join(app.instance_path, 'media/img', newfilename)
         #f.save(filepath)
         resize_picture((260, 180),form.photo.data,filepath)
-        print(app.instance_path)
         user_dict = db.users.find_one({"_id":ObjectId(current_user.get_id()) })
         del user_dict["password"]
         sign_dict = {  "title":form.title.data,
@@ -251,7 +243,6 @@ def gosign(object_id):
         userid = None
     form = CommentForm()
     if form.validate_on_submit():
-        print("Here")
         db.signs.update_one(   { "_id": ObjectId(object_id) },
                               { "$push": { "comments": { "comment": form.comment.data.strip(),
                                                          "username" : username,
@@ -280,6 +271,50 @@ def gosign(object_id):
         )
     sign = process_signs(list(sign))[0]
     return render_template('gosign.html', sign=sign, form=form)
+
+
+@app.route('/report/<string:object_id>', methods=['GET', 'POST'])
+@login_required
+def report(object_id):
+    form = ReportForm()
+    if form.validate_on_submit():
+        user_id = ObjectId(current_user.get_id())
+        reason_display = dict(REASONS).get(form.reason.data)
+        report_dict = {"username":current_user.get_username(),"user_id":user_id,
+                        "sign_id":ObjectId(object_id),"reason":form.reason.data,"reason_text":reason_display,
+                        "comment":form.comment.data,"datelogged":datetime.datetime.now()}
+        db.reports.insert_one(report_dict)
+        flash(u"You have successfully reported this sign as inappropriate","success")
+        return redirect(url_for("gosign", object_id=object_id))
+    elif form.errors:
+        print(form.errors)
+        error_message = "You have errors on the form"
+        flash(u"You have errors on the form","danger")
+    return render_template('report.html',form=form)
+
+@app.route('/contact', methods=['GET', 'POST'])
+def contact():
+    form = ContactForm()
+    if form.validate_on_submit():
+        if current_user.is_authenticated:
+            user_id = ObjectId(current_user.get_id())
+            user_name = current_user.get_username()
+        else:
+            user_id = "Anonymous"
+            user_name = "Anonymous"
+        user_id = ObjectId(current_user.get_id())
+        send_to_admin(user_name,form.message.data)
+        contact_dict = {"username":user_name,"user_id":user_id,
+                        "message":form.message.data,"datelogged":datetime.datetime.now()}
+        db.reports.insert_one(contact_dict)
+        flash(u"You have successfully contacted the website admin","success")
+        return redirect(url_for("latest"))
+    elif form.errors:
+        print(form.errors)
+        error_message = "You have errors on the form"
+        flash(u"You have errors on the form","danger")
+    return render_template('contact.html',form=form)
+
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
@@ -317,7 +352,6 @@ def confirm(confirm_hash):
     success_message = None
     error_message = None
     user = db.users.find_one({"hash":confirm_hash})
-    print("hash",confirm_hash)
     form = LoginForm()
     if user:
         if user["dateregistered"] + datetime.timedelta(hours=1) > datetime.datetime.now():
@@ -358,8 +392,6 @@ def forgot(confirm_hash=None):
         confirmed = True
         if form.validate_on_submit():
             user = db.users.find_one({"forgothash":confirm_hash})
-            print(confirm_hash)
-            print(user)
             if user:
                 if user["dateforgot"] + datetime.timedelta(hours=1) > datetime.datetime.now():
                     #Get password hash and update
@@ -371,7 +403,6 @@ def forgot(confirm_hash=None):
                                           { "$unset": { "forgothash": "","dateforgot": ""} }
                     )
                     flash(u"Password Rest, please login below","success")
-                    print("Reset")
                     return redirect(url_for("home"))
                 else:
                     db.users.update_one(   { "_id": user["_id"] },
@@ -387,7 +418,6 @@ def forgot(confirm_hash=None):
             print(form.errors)
             errorstring = u"Check that the passwords match and meet the complexity requirements"
             flash(errorstring,"danger")
-            print(errorstring)
     return render_template("forgot.html", forgotform=forgotform, form=form, forgot=forgot, confirmed=confirmed)
 
 @app.route("/changepassword", methods=["GET","POST"])

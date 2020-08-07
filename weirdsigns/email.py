@@ -46,3 +46,20 @@ def sendforgot(to, hash):
         print(response.headers)
     except Exception as e:
         print(e)
+
+def send_to_admin(username, message):
+    msgbody = '<p>' + username + ' sent the message below:</p>' + \
+              '<p style="text-decoration:italic;">' + message + '</p>'
+    message = Mail(
+        from_email=FROM_ADDRESS,
+        to_emails="cbri4nt@gmail.com",
+        subject='' + username + ' - sent a message',
+        html_content= msgbody)
+    try:
+        sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
+        response = sg.send(message)
+        print(response.status_code)
+        print(response.body)
+        print(response.headers)
+    except Exception as e:
+        print(e)

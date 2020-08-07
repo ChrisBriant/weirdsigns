@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 from werkzeug.utils import secure_filename
-from wtforms import SubmitField, StringField, PasswordField, BooleanField,DecimalField
+from wtforms import SubmitField, StringField, PasswordField, BooleanField,DecimalField,SelectField
 from wtforms.validators import DataRequired, Email, Length, EqualTo, ValidationError
 from wtforms.widgets import TextArea
 import re
@@ -64,3 +64,14 @@ class SignSubmitByIdForm(FlaskForm):
 class CommentForm(FlaskForm):
     comment = StringField("Comment:", validators=[DataRequired()], widget=TextArea())
     submit = SubmitField("Add Comment")
+
+REASONS = [('1', 'Not relevant to site theme'), ('2', 'Causes Offence'), ('3', 'Sexual / Pornographic content'), ('4', 'Incites violence, hatred or racism')]
+
+class ReportForm(FlaskForm):
+    reason = SelectField(u'Reason', choices=REASONS,validators=[DataRequired()])
+    comment = StringField("Please comment below on your reasons for reporting this image / post as inapproprate:", validators=[DataRequired()], widget=TextArea())
+    submit = SubmitField("Report")
+
+class ContactForm(FlaskForm):
+    message = StringField("Send a message to the website admin below:", validators=[DataRequired()], widget=TextArea())
+    submit = SubmitField("Contact")

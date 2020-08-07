@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block content %}
     <header>
-      <div class="row">
+      <div class="row device-large">
         {% if not current_user.is_authenticated %}
           <div class="col-8 hero-text">
             <h1 class="herotitle">Weird Signs</h1>
@@ -12,6 +12,33 @@
           <div class="col-4 hero-login-col">
             <div class="hero-login">
               {% include 'login.html' %}
+            </div>
+          </div>
+        {% else %}
+          <div class="col-12 hero-text">
+            <h1 class="herotitle">Weird Signs</h1>
+            <p>Take a look at some of the funniest signs and notices people put up.</p>
+            <p>Login to upload funny signs that you have seen</p>
+            <a href="/latest">View the Latest Here</a>
+          </div>
+        {% endif %}
+      </div>
+      <!-- for small devices -->
+      <div class="row device-small">
+        {% if not current_user.is_authenticated %}
+          <div class="row">
+            <div class="col-12 hero-text">
+              <h1 class="herotitle">Weird Signs</h1>
+              <p>Take a look at some of the funniest signs and notices people put up.</p>
+              <p>Login to upload funny signs that you have seen</p>
+              <a href="/latest">View the Latest Here</a>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12 hero-login-col">
+              <div class="hero-login">
+                {% include 'login.html' %}
+              </div>
             </div>
           </div>
         {% else %}

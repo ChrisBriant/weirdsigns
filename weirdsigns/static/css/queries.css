@@ -1,0 +1,11 @@
+
+/* small*/
+@media only screen and (max-width: 480px) {
+  .device-large {
+    display:none;
+  }
+
+  .device-small {
+    display:inline-block;
+  }
+}

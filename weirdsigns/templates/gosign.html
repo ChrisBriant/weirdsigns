@@ -18,6 +18,7 @@
       });
     </script>
     <section class="section-onesign">
+      {% include 'messages.html' %}
       <div class="row">
         <div class="col-12 page-head"><h1>{{ sign.title }}</h1></div>
       </div>
@@ -117,6 +118,7 @@
                         <a id="{{ sign._id }}" class="submit-rating" href="#" style="display:none;"><i class="fa fa-check-circle-o"></i></a><br>
                       </div>
                     {% endif %}
+                    <div><a href="/report/{{ sign._id }}">report inappropriate</a></div>
                   {% endif %}
                 </div>
                 <div class="col">
