@@ -72,13 +72,17 @@ def home():
     form = LoginForm()
     if form.validate_on_submit():
         user_dict = db.users.find_one({"email":form.email.data })
-        if user_dict["enabled"] and bcrypt.check_password_hash(user_dict["password"],form.password.data):
-            user = User(id=str(user_dict["_id"]), username=user_dict["username"])
-            login_user(user, remember=form.remember.data)
-            return redirect(url_for("latest"))
+        if user_dict:
+            if user_dict["enabled"] and bcrypt.check_password_hash(user_dict["password"],form.password.data):
+                user = User(id=str(user_dict["_id"]), username=user_dict["username"])
+                login_user(user, remember=form.remember.data)
+                return redirect(url_for("latest"))
+            else:
+                flash(u"Login unsuccessful!","danger")
+                message = "Login unsuccessful!"
         else:
             flash(u"Login unsuccessful!","danger")
-            message = "Login unsuccessful!"
+            message = "Sorry, that account doesn't exist or the password is incorrect"
     else:
         print(form.errors)
     return render_template("home.html",form=form,home=True,message=message)
