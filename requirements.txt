@@ -25,7 +25,7 @@ pytz==2019.2
 requests==2.22.0
 sendgrid==6.4.3
 six==1.12.0
-starkbank-ecdsa==1.0.0
+starkbank-ecdsa==2.0.1
 static-parameters==0.4
 urllib3==1.25.5
 visitor==0.1.3
